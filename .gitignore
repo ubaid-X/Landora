@@ -1,0 +1,86 @@
+# Real MySQL password. Never enters Git history.
+backend/config/secrets.php
+
+# Per-machine secrets override (dev / staging / production).
+backend/config/secrets.local.php
+
+# Environment file (industry standard). Not used yet, but prevents future leaks.
+.env
+
+# Local environment override.
+.env.local
+
+# Any machine-specific .env variant.
+.env.*.local
+
+# Encryption / signing keys. A leaked key compromises security.
+*.key
+
+# TLS / SSH private key files.
+*.pem
+
+# Certificate files.
+*.crt
+
+# Default SSH private key name.
+id_rsa
+
+# Default SSH public key name.
+id_rsa.pub
+
+# Live PHP session cookie captured during curl tests.
+backend/cookies.txt
+
+# One-time admin setup script with a hardcoded key. Deleted after use.
+backend/setup/
+
+# Local debug scripts. Expose schema details, bypass normal flows.
+backend/test-*.php
+
+# Server logs may contain SQL and user data.
+*.log
+
+# PHP error log file.
+error_log
+
+# Dealer-uploaded property images. User data, not source code.
+uploads/
+
+# VS Code workspace settings (personal per developer).
+.vscode/
+
+# VS Code workspace file.
+*.code-workspace
+
+# JetBrains IDE settings (PhpStorm, WebStorm, IntelliJ).
+.idea/
+
+# JetBrains module files.
+*.iml
+
+# macOS Finder metadata file.
+.DS_Store
+
+# Windows thumbnail cache file.
+Thumbs.db
+
+# Windows folder settings file.
+Desktop.ini
+
+# Vim temporary swap files.
+*.swp
+
+# Editor backup files ending in tilde.
+*~
+
+# Node dependencies (auto-generated from package.json).
+node_modules/
+
+# Composer dependencies (auto-generated from composer.json).
+vendor/
+
+# Build output from bundlers.
+dist/
+
+# Build output from other build tools.
+build/

@@ -1,0 +1,343 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Admin Dashboard — Property Dealing</title>
+
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+      rel="stylesheet"
+    />
+    <link href="/frontend/shared/css/style.css" rel="stylesheet" />
+  </head>
+  <body>
+    <div id="navbar" data-navbar="admin"></div>
+
+    <main class="page-surface">
+      <div class="container-1320">
+        <!-- LOADING -->
+        <div id="loadingState">
+          <div
+            class="skeleton"
+            style="
+              height: 60px;
+              width: 40%;
+              margin-bottom: 24px;
+              border-radius: 8px;
+            "
+          ></div>
+          <div class="row g-4 mb-4">
+            <div class="col-6 col-md-4 col-xl">
+              <div
+                class="skeleton"
+                style="height: 140px; border-radius: 12px"
+              ></div>
+            </div>
+            <div class="col-6 col-md-4 col-xl">
+              <div
+                class="skeleton"
+                style="height: 140px; border-radius: 12px"
+              ></div>
+            </div>
+            <div class="col-6 col-md-4 col-xl">
+              <div
+                class="skeleton"
+                style="height: 140px; border-radius: 12px"
+              ></div>
+            </div>
+            <div class="col-6 col-md-4 col-xl">
+              <div
+                class="skeleton"
+                style="height: 140px; border-radius: 12px"
+              ></div>
+            </div>
+            <div class="col-6 col-md-4 col-xl">
+              <div
+                class="skeleton"
+                style="height: 140px; border-radius: 12px"
+              ></div>
+            </div>
+          </div>
+          <div class="row g-4">
+            <div class="col-12 col-md-6">
+              <div
+                class="skeleton"
+                style="height: 100px; border-radius: 12px"
+              ></div>
+            </div>
+            <div class="col-12 col-md-6">
+              <div
+                class="skeleton"
+                style="height: 100px; border-radius: 12px"
+              ></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ERROR -->
+        <div id="errorState" style="display: none">
+          <div class="empty-state">
+            <i class="fa-regular fa-circle-xmark"></i>
+            <h5 id="errorTitle">Unable to load dashboard</h5>
+            <p id="errorMessage">Please refresh the page or try again later.</p>
+          </div>
+        </div>
+
+        <!-- CONTENT -->
+        <div id="contentState" style="display: none">
+          <!-- Page header -->
+          <div class="form-page-header">
+            <span class="form-page-header__icon"
+              ><i class="fa-solid fa-table-cells-large"></i
+            ></span>
+            <div>
+              <h1>Admin Dashboard</h1>
+              <p class="text-muted-brand mb-0" style="font-size: 15px">
+                Overview of dealers and properties.
+              </p>
+            </div>
+          </div>
+
+          <!-- Stat cards -->
+          <div class="row g-4 mb-4">
+            <div class="col-6 col-md-4 col-xl">
+              <div class="admin-stat-card">
+                <div
+                  class="admin-stat-card__icon admin-stat-card__icon--dealers"
+                >
+                  <i class="fa-solid fa-users"></i>
+                </div>
+                <div>
+                  <p
+                    class="admin-stat-card__value admin-stat-card__value--dealers"
+                    id="statTotalDealers"
+                  >
+                    0
+                  </p>
+                  <p class="admin-stat-card__label">Total Dealers</p>
+                  <p class="admin-stat-card__sub">Dealers</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-6 col-md-4 col-xl">
+              <div class="admin-stat-card">
+                <div
+                  class="admin-stat-card__icon admin-stat-card__icon--pending"
+                >
+                  <i class="fa-solid fa-clock"></i>
+                </div>
+                <div>
+                  <p
+                    class="admin-stat-card__value admin-stat-card__value--pending"
+                    id="statPendingDealers"
+                  >
+                    0
+                  </p>
+                  <p class="admin-stat-card__label">Pending Dealers</p>
+                  <p class="admin-stat-card__sub">Dealers</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-6 col-md-4 col-xl">
+              <div class="admin-stat-card">
+                <div
+                  class="admin-stat-card__icon admin-stat-card__icon--approved"
+                >
+                  <i class="fa-solid fa-circle-check"></i>
+                </div>
+                <div>
+                  <p
+                    class="admin-stat-card__value admin-stat-card__value--approved"
+                    id="statApprovedDealers"
+                  >
+                    0
+                  </p>
+                  <p class="admin-stat-card__label">Approved Dealers</p>
+                  <p class="admin-stat-card__sub">Dealers</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-6 col-md-4 col-xl">
+              <div class="admin-stat-card">
+                <div
+                  class="admin-stat-card__icon admin-stat-card__icon--rejected"
+                >
+                  <i class="fa-solid fa-circle-xmark"></i>
+                </div>
+                <div>
+                  <p
+                    class="admin-stat-card__value admin-stat-card__value--rejected"
+                    id="statRejectedDealers"
+                  >
+                    0
+                  </p>
+                  <p class="admin-stat-card__label">Rejected Dealers</p>
+                  <p class="admin-stat-card__sub">Dealers</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-6 col-md-4 col-xl">
+              <div class="admin-stat-card">
+                <div
+                  class="admin-stat-card__icon admin-stat-card__icon--properties"
+                >
+                  <i class="fa-solid fa-house"></i>
+                </div>
+                <div>
+                  <p
+                    class="admin-stat-card__value admin-stat-card__value--properties"
+                    id="statTotalProperties"
+                  >
+                    0
+                  </p>
+                  <p class="admin-stat-card__label">Total Properties</p>
+                  <p class="admin-stat-card__sub">Properties</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Quick actions -->
+          <div class="row g-4">
+            <div class="col-12 col-md-6">
+              <a href="/frontend/admin/dealers.html" class="admin-action-card">
+                <div
+                  class="admin-action-card__icon admin-action-card__icon--dealers"
+                >
+                  <i class="fa-solid fa-users"></i>
+                </div>
+                <div class="admin-action-card__body">
+                  <p class="admin-action-card__title">Manage Dealers</p>
+                  <p class="admin-action-card__desc">
+                    Review and approve dealers.
+                  </p>
+                </div>
+                <span class="admin-action-card__arrow">
+                  <i class="fa-solid fa-arrow-right"></i>
+                </span>
+              </a>
+            </div>
+
+            <div class="col-12 col-md-6">
+              <a
+                href="/frontend/admin/properties.html"
+                class="admin-action-card"
+              >
+                <div
+                  class="admin-action-card__icon admin-action-card__icon--properties"
+                >
+                  <i class="fa-solid fa-house"></i>
+                </div>
+                <div class="admin-action-card__body">
+                  <p class="admin-action-card__title">Manage Properties</p>
+                  <p class="admin-action-card__desc">
+                    Review and approve properties.
+                  </p>
+                </div>
+                <span class="admin-action-card__arrow">
+                  <i class="fa-solid fa-arrow-right"></i>
+                </span>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <div id="footer"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/frontend/shared/js/api.js"></script>
+    <script src="/frontend/shared/js/partials.js"></script>
+
+    <script>
+      (function () {
+        "use strict";
+
+        const loadingState = document.getElementById("loadingState");
+        const errorState = document.getElementById("errorState");
+        const contentState = document.getElementById("contentState");
+        const errorTitle = document.getElementById("errorTitle");
+        const errorMessage = document.getElementById("errorMessage");
+
+        const elTotalDealers = document.getElementById("statTotalDealers");
+        const elPendingDealers = document.getElementById("statPendingDealers");
+        const elApprovedDealers = document.getElementById(
+          "statApprovedDealers",
+        );
+        const elRejectedDealers = document.getElementById(
+          "statRejectedDealers",
+        );
+        const elTotalProperties = document.getElementById(
+          "statTotalProperties",
+        );
+
+        function showState(which) {
+          loadingState.style.display = which === "loading" ? "block" : "none";
+          errorState.style.display = which === "error" ? "block" : "none";
+          contentState.style.display = which === "content" ? "block" : "none";
+        }
+
+        async function loadDashboard() {
+          showState("loading");
+
+          try {
+            // Auth check
+            const auth = await API.requireAuth("admin");
+            if (!auth) return;
+
+            // Load dealers + properties in parallel
+            const [dealersRes, propsRes] = await Promise.all([
+              API.get("/admin/list-dealers.php"),
+              API.get("/admin/list-properties.php"),
+            ]);
+
+            if (!dealersRes.success || !propsRes.success) {
+              errorTitle.textContent = "Unable to load dashboard";
+              errorMessage.textContent =
+                dealersRes.message || propsRes.message || "Please try again.";
+              showState("error");
+              return;
+            }
+
+            const dealers = dealersRes.dealers || [];
+            const props = propsRes.properties || [];
+
+            let pending = 0,
+              approved = 0,
+              rejected = 0;
+            dealers.forEach(function (d) {
+              if (d.verification_status === "pending") pending++;
+              else if (d.verification_status === "approved") approved++;
+              else if (d.verification_status === "rejected") rejected++;
+            });
+
+            elTotalDealers.textContent = dealers.length;
+            elPendingDealers.textContent = pending;
+            elApprovedDealers.textContent = approved;
+            elRejectedDealers.textContent = rejected;
+            elTotalProperties.textContent = props.length;
+
+            showState("content");
+          } catch (err) {
+            errorTitle.textContent = "Unable to load dashboard";
+            errorMessage.textContent =
+              "Please check your connection and try again.";
+            showState("error");
+          }
+        }
+
+        loadDashboard();
+      })();
+    </script>
+  </body>
+</html>

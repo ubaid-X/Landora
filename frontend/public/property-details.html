@@ -1,0 +1,512 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Property Details — Property Dealing</title>
+
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/glightbox/dist/css/glightbox.min.css"
+      rel="stylesheet"
+    />
+    <link href="/frontend/shared/css/style.css" rel="stylesheet" />
+  </head>
+  <body>
+    <div id="navbar" data-navbar="public"></div>
+
+    <main class="page-surface">
+      <div class="container-1320">
+        <a href="/frontend/public/index.html" class="back-link">
+          <i class="fa-solid fa-arrow-left"></i> Back to Listings
+        </a>
+
+        <!-- LOADING -->
+        <div id="loadingState">
+          <div class="row g-4">
+            <div class="col-12 col-md-8">
+              <div
+                class="skeleton"
+                style="aspect-ratio: 16/9; border-radius: 12px"
+              ></div>
+            </div>
+            <div class="col-12 col-md-4">
+              <div
+                class="skeleton"
+                style="height: 260px; border-radius: 12px"
+              ></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ERROR -->
+        <div id="errorState" style="display: none">
+          <div class="empty-state">
+            <i class="fa-regular fa-circle-xmark"></i>
+            <h5 id="errorTitle">Property not found</h5>
+            <p id="errorMessage">
+              The property you are looking for does not exist or is not
+              available.
+            </p>
+            <a href="/frontend/public/index.html" class="btn btn-primary">
+              <i class="fa-solid fa-arrow-left"></i> Back to Listings
+            </a>
+          </div>
+        </div>
+
+        <!-- CONTENT -->
+        <div id="contentState" style="display: none">
+          <!-- ROW 1 — Desktop: gallery left (8) / price card right (4)
+                      Mobile: gallery full width, price card below -->
+          <div class="row g-4 align-items-start">
+            <div class="col-12 col-md-8">
+              <div class="detail-gallery">
+                <div class="detail-gallery__main" id="galleryMain">
+                  <div class="img-fallback">
+                    <i class="fa-regular fa-image"></i
+                    ><span>No image available</span>
+                  </div>
+                  <span
+                    class="detail-gallery__count"
+                    id="galleryCount"
+                    style="display: none"
+                  ></span>
+                </div>
+                <div class="detail-gallery__thumbs" id="galleryThumbs"></div>
+              </div>
+            </div>
+
+            <div class="col-12 col-md-4">
+              <div class="price-card price-card-sticky">
+                <p class="price-card__price" id="detailPrice"></p>
+                <span class="price-card__status" id="detailStatus"></span>
+
+                <div class="price-card__divider"></div>
+
+                <p class="price-card__heading">Contact Us</p>
+
+                <a class="price-card__phone" id="detailPhoneLink" href="#">
+                  <i class="fa-solid fa-phone"></i>
+                  <span id="detailPhoneText"></span>
+                </a>
+
+                <a
+                  class="btn btn-primary w-100 mb-2"
+                  id="detailCallBtn"
+                  href="#"
+                >
+                  <i class="fa-solid fa-phone"></i> Call Now
+                </a>
+
+                <a
+                  class="btn btn-outline-primary w-100"
+                  id="detailWhatsappBtn"
+                  href="#"
+                  target="_blank"
+                  rel="noopener"
+                >
+                  <i class="fa-brands fa-whatsapp"></i> WhatsApp
+                </a>
+
+                <button
+                  type="button"
+                  class="btn btn-ghost w-100 mt-2"
+                  id="detailShareBtn"
+                >
+                  <i class="fa-solid fa-share-nodes"></i> Share on WhatsApp
+                </button>
+
+                <p class="price-card__note">
+                  Contact us to arrange a meeting with the dealer.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- ROW 2 — Title / description / details / dealer (left column only) -->
+          <div class="row g-4 mt-1">
+            <div class="col-12 col-md-8">
+              <h1 class="detail-title" id="detailTitle"></h1>
+              <p class="detail-desc" id="detailDescription"></p>
+
+              <div class="info-table">
+                <div class="info-table__row">
+                  <span class="info-table__icon"
+                    ><i class="fa-solid fa-house"></i
+                  ></span>
+                  <span class="info-table__label">Type</span>
+                  <span class="info-table__value" id="detailType"></span>
+                </div>
+                <div class="info-table__row">
+                  <span class="info-table__icon"
+                    ><i class="fa-solid fa-ruler-combined"></i
+                  ></span>
+                  <span class="info-table__label">Area</span>
+                  <span class="info-table__value" id="detailArea"></span>
+                </div>
+                <div class="info-table__row">
+                  <span class="info-table__icon"
+                    ><i class="fa-solid fa-location-dot"></i
+                  ></span>
+                  <span class="info-table__label">Location</span>
+                  <span class="info-table__value" id="detailLocation"></span>
+                </div>
+                <div class="info-table__row">
+                  <span class="info-table__icon"
+                    ><i class="fa-regular fa-calendar"></i
+                  ></span>
+                  <span class="info-table__label">Listed</span>
+                  <span class="info-table__value" id="detailListed"></span>
+                </div>
+              </div>
+
+              <div class="dealer-block">
+                <div class="dealer-block__label">Listed by</div>
+                <div class="dealer-block__name">
+                  <i class="fa-solid fa-building"></i>
+                  <span id="detailDealer"></span>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-12 col-md-4"></div>
+          </div>
+
+          <!-- TRUST STRIP -->
+          <div class="trust-strip mt-5">
+            <div class="row g-4">
+              <div class="col-12 col-md-6 col-lg-3">
+                <div class="trust-item">
+                  <i class="fa-solid fa-circle-check trust-item__icon"></i>
+                  <div>
+                    <h6 class="trust-item__title">Verified Dealers</h6>
+                    <p class="trust-item__desc">
+                      All dealers are verified and trusted
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <div class="col-12 col-md-6 col-lg-3">
+                <div class="trust-item">
+                  <i class="fa-solid fa-shield-halved trust-item__icon"></i>
+                  <div>
+                    <h6 class="trust-item__title">Secure Platform</h6>
+                    <p class="trust-item__desc">Your safety is our priority</p>
+                  </div>
+                </div>
+              </div>
+              <div class="col-12 col-md-6 col-lg-3">
+                <div class="trust-item">
+                  <i class="fa-solid fa-comments trust-item__icon"></i>
+                  <div>
+                    <h6 class="trust-item__title">Direct Contact</h6>
+                    <p class="trust-item__desc">
+                      You deal with our team personally
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <div class="col-12 col-md-6 col-lg-3">
+                <div class="trust-item">
+                  <i class="fa-solid fa-location-dot trust-item__icon"></i>
+                  <div>
+                    <h6 class="trust-item__title">Local Focus</h6>
+                    <p class="trust-item__desc">Swat &amp; KP properties</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <div id="footer"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/glightbox/dist/js/glightbox.min.js"></script>
+    <script src="/frontend/shared/js/api.js"></script>
+    <script src="/frontend/shared/js/partials.js"></script>
+
+    <script>
+      (function () {
+        "use strict";
+
+        const loadingState = document.getElementById("loadingState");
+        const errorState = document.getElementById("errorState");
+        const contentState = document.getElementById("contentState");
+        const errorTitle = document.getElementById("errorTitle");
+        const errorMessage = document.getElementById("errorMessage");
+
+        let lightbox = null;
+        let currentImages = [];
+
+        function statusBadgeHtml(status) {
+          const cls = status === "sold" ? "badge-sold" : "badge-unsold";
+          const label = status === "sold" ? "Sold" : "Unsold";
+          return (
+            '<span class="badge-pill-custom ' + cls + '">' + label + "</span>"
+          );
+        }
+
+        function formatDate(str) {
+          if (!str) return "";
+          const parts = str.split(" ")[0].split("-");
+          if (parts.length !== 3) return str;
+          const months = [
+            "Jan",
+            "Feb",
+            "Mar",
+            "Apr",
+            "May",
+            "Jun",
+            "Jul",
+            "Aug",
+            "Sep",
+            "Oct",
+            "Nov",
+            "Dec",
+          ];
+          return (
+            parts[2] + " " + months[parseInt(parts[1], 10) - 1] + " " + parts[0]
+          );
+        }
+
+        function cleanPhoneForTel(p) {
+          return (p || "").replace(/[^\d+]/g, "");
+        }
+        function cleanPhoneForWa(p) {
+          return (p || "").replace(/[^\d]/g, "");
+        }
+
+        function openLightbox(startIndex) {
+          const items = currentImages.map(function (u) {
+            return { href: u, type: "image" };
+          });
+          if (lightbox) lightbox.destroy();
+          lightbox = GLightbox({
+            elements: items,
+            startAt: startIndex,
+            touchNavigation: true,
+            loop: true,
+            zoomable: false,
+          });
+          lightbox.open();
+        }
+
+        function setMainImage(index) {
+          if (!currentImages[index]) return;
+          const main = document.getElementById("galleryMain");
+          const countEl = document.getElementById("galleryCount");
+          const countHtml =
+            countEl && countEl.style.display !== "none"
+              ? countEl.outerHTML
+              : "";
+          main.innerHTML =
+            '<img src="' +
+            currentImages[index] +
+            '" alt="Property image">' +
+            countHtml;
+          document.querySelectorAll(".detail-thumb").forEach(function (t, i) {
+            t.classList.toggle("active", i === index);
+          });
+          main.onclick = function () {
+            openLightbox(index);
+          };
+        }
+
+        function renderGallery(images) {
+          currentImages = images || [];
+
+          const main = document.getElementById("galleryMain");
+          const countEl = document.getElementById("galleryCount");
+          const thumbsEl = document.getElementById("galleryThumbs");
+
+          if (currentImages.length === 0) {
+            countEl.style.display = "none";
+            thumbsEl.style.display = "none";
+            return;
+          }
+
+          // Main image
+          main.innerHTML =
+            '<img src="' + currentImages[0] + '" alt="Property image">';
+          main.appendChild(countEl);
+
+          // +N badge if more than one image
+          if (currentImages.length > 1) {
+            countEl.innerHTML =
+              '<i class="fa-regular fa-images"></i> +' +
+              (currentImages.length - 1);
+            countEl.style.display = "inline-flex";
+          } else {
+            countEl.style.display = "none";
+          }
+
+          main.onclick = function () {
+            openLightbox(0);
+          };
+
+          // Thumbnail strip — hide if only one image
+          if (currentImages.length <= 1) {
+            thumbsEl.style.display = "none";
+            return;
+          }
+
+          thumbsEl.style.display = "grid";
+          thumbsEl.innerHTML = currentImages
+            .map(function (url, i) {
+              return (
+                '<button type="button" class="detail-thumb' +
+                (i === 0 ? " active" : "") +
+                '" data-index="' +
+                i +
+                '">' +
+                '<img src="' +
+                url +
+                '" alt="Thumbnail ' +
+                (i + 1) +
+                '">' +
+                "</button>"
+              );
+            })
+            .join("");
+
+          thumbsEl.querySelectorAll(".detail-thumb").forEach(function (btn) {
+            btn.addEventListener("click", function () {
+              const idx = parseInt(btn.getAttribute("data-index"), 10);
+              setMainImage(idx);
+            });
+          });
+        }
+
+        function renderProperty(p, platformContact) {
+          document.getElementById("detailTitle").textContent = p.title || "";
+          document.getElementById("detailDescription").textContent =
+            p.description || "";
+
+          document.getElementById("detailPrice").textContent = API.formatPrice(
+            p.price,
+          );
+          document.getElementById("detailStatus").innerHTML = statusBadgeHtml(
+            p.property_status,
+          );
+
+          document.getElementById("detailType").textContent =
+            p.property_type || "";
+          document.getElementById("detailArea").textContent =
+            (p.area_size || "") + " " + (p.area_unit || "");
+          document.getElementById("detailLocation").textContent =
+            (p.city || "") + ", " + (p.province || "");
+          document.getElementById("detailListed").textContent = formatDate(
+            p.created_at,
+          );
+
+          document.getElementById("detailDealer").textContent =
+            p.dealer_business_name || "";
+
+          const phone =
+            platformContact && platformContact.phone
+              ? platformContact.phone
+              : "";
+          document.getElementById("detailPhoneText").textContent = phone;
+
+          const telHref = "tel:" + cleanPhoneForTel(phone);
+          document.getElementById("detailPhoneLink").href = telHref;
+          document.getElementById("detailCallBtn").href = telHref;
+
+          document.getElementById("detailWhatsappBtn").href =
+            "https://wa.me/" + cleanPhoneForWa(phone);
+
+          const urls = (p.images || []).map(function (img) {
+            return API.imageUrl(img.image_path);
+          });
+          renderGallery(urls);
+        }
+
+        function showState(which) {
+          loadingState.style.display = which === "loading" ? "block" : "none";
+          errorState.style.display = which === "error" ? "block" : "none";
+          contentState.style.display = which === "content" ? "block" : "none";
+        }
+
+        async function loadProperty() {
+          const id = parseInt(API.getQuery("property_id") || "0", 10);
+          if (!id || id <= 0) {
+            errorTitle.textContent = "Invalid property";
+            errorMessage.textContent =
+              "No property was specified. Please go back to the listings.";
+            showState("error");
+            return;
+          }
+
+          showState("loading");
+
+          try {
+            // Send count_view=1 only if this tab hasn't already viewed this property
+            const viewKey = "viewed_property_" + id;
+            const alreadyViewed = sessionStorage.getItem(viewKey) === "1";
+
+            const query =
+              "?property_id=" + id + (alreadyViewed ? "" : "&count_view=1");
+            const res = await API.get("/public/get-property.php" + query);
+
+            if (!alreadyViewed) {
+              sessionStorage.setItem(viewKey, "1");
+            }
+
+            if (!res.success || !res.property) {
+              errorTitle.textContent = "Property not found";
+              errorMessage.textContent =
+                res.message ||
+                "The property does not exist or is not available.";
+              showState("error");
+              return;
+            }
+
+            document.title = res.property.title + " — Property Dealing";
+            renderProperty(res.property, res.platform_contact);
+            showState("content");
+          } catch (err) {
+            errorTitle.textContent = "Unable to load property";
+            errorMessage.textContent =
+              "Please check your connection and try again.";
+            showState("error");
+          }
+        }
+
+        // --------------------------------------------------
+        // Share on WhatsApp
+        // --------------------------------------------------
+        document
+          .getElementById("detailShareBtn")
+          .addEventListener("click", function () {
+            const title =
+              document.getElementById("detailTitle").textContent || "Property";
+            const price =
+              document.getElementById("detailPrice").textContent || "";
+            const location =
+              document.getElementById("detailLocation").textContent || "";
+            const url = window.location.href;
+
+            let msg = "🏠 " + title + "\n";
+            if (price) msg += "💰 " + price + "\n";
+            if (location) msg += "📍 " + location + "\n";
+            msg += "\nView on Property Dealing:\n" + url;
+
+            const encoded = encodeURIComponent(msg);
+            window.open("https://wa.me/?text=" + encoded, "_blank", "noopener");
+          });
+
+        loadProperty();
+      })();
+    </script>
+  </body>
+</html>

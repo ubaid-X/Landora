@@ -1,0 +1,289 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>My Profile — Property Dealing</title>
+
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+      rel="stylesheet"
+    />
+    <link href="/frontend/shared/css/style.css" rel="stylesheet" />
+  </head>
+  <body>
+    <div id="navbar" data-navbar="dealer"></div>
+
+    <main class="page-surface">
+      <div class="container-1320">
+        <!-- LOADING -->
+        <div id="loadingState">
+          <div
+            class="skeleton"
+            style="
+              height: 60px;
+              width: 40%;
+              margin-bottom: 24px;
+              border-radius: 8px;
+            "
+          ></div>
+          <div class="row g-4">
+            <div class="col-12 col-lg-8">
+              <div
+                class="skeleton"
+                style="height: 520px; border-radius: 12px"
+              ></div>
+            </div>
+            <div class="col-12 col-lg-4">
+              <div
+                class="skeleton"
+                style="height: 280px; border-radius: 12px"
+              ></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ERROR -->
+        <div id="errorState" style="display: none">
+          <div class="empty-state">
+            <i class="fa-regular fa-circle-xmark"></i>
+            <h5 id="errorTitle">Unable to load profile</h5>
+            <p id="errorMessage">Please refresh the page or try again later.</p>
+          </div>
+        </div>
+
+        <!-- CONTENT -->
+        <div id="contentState" style="display: none">
+          <div class="profile-header">
+            <h1>My Profile</h1>
+            <p>View your account and verification information.</p>
+          </div>
+
+          <div class="row g-4">
+            <!-- LEFT: Business Information -->
+            <div class="col-12 col-lg-8">
+              <div class="profile-card">
+                <div class="profile-card__header">
+                  <i class="fa-solid fa-building"></i>
+                  <span>Business Information</span>
+                </div>
+                <div class="profile-card__body">
+                  <div class="profile-row">
+                    <div class="profile-row__label">Username</div>
+                    <div class="profile-row__value" id="pUsername">—</div>
+                  </div>
+
+                  <div class="profile-row">
+                    <div class="profile-row__label">Email</div>
+                    <div class="profile-row__value" id="pEmail">—</div>
+                  </div>
+
+                  <div class="profile-row">
+                    <div class="profile-row__label">Business Name</div>
+                    <div class="profile-row__value" id="pBusinessName">—</div>
+                  </div>
+
+                  <div class="profile-row">
+                    <div class="profile-row__label">Owner Name</div>
+                    <div class="profile-row__value" id="pOwnerName">—</div>
+                  </div>
+
+                  <div class="profile-row">
+                    <div class="profile-row__label">Phone</div>
+                    <div class="profile-row__value" id="pPhone">—</div>
+                  </div>
+
+                  <div class="profile-row">
+                    <div class="profile-row__label">WhatsApp</div>
+                    <div class="profile-row__value" id="pWhatsapp">—</div>
+                  </div>
+
+                  <div class="profile-row">
+                    <div class="profile-row__label">Full Address</div>
+                    <div class="profile-row__value" id="pFullAddress">—</div>
+                  </div>
+
+                  <div class="profile-row">
+                    <div class="profile-row__label">Province</div>
+                    <div class="profile-row__value" id="pProvince">—</div>
+                  </div>
+
+                  <div class="profile-row">
+                    <div class="profile-row__label">City</div>
+                    <div class="profile-row__value" id="pCity">—</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- RIGHT: Verification Status -->
+            <div class="col-12 col-lg-4">
+              <div class="status-card" id="statusCard">
+                <div class="status-card__header">
+                  <i class="fa-solid fa-shield-halved" id="statusIcon"></i>
+                  <span>Verification Status</span>
+                </div>
+
+                <div
+                  class="status-card__badge status-card__badge--approved"
+                  id="statusBadge"
+                >
+                  <i class="fa-solid fa-circle-check" id="statusBadgeIcon"></i>
+                  <span id="statusBadgeText">Approved</span>
+                </div>
+
+                <div class="status-card__divider"></div>
+
+                <div class="status-card__meta-label">Member Since</div>
+                <p class="status-card__meta-value" id="pMemberSince">—</p>
+
+                <div class="status-card__divider"></div>
+
+                <a
+                  href="/frontend/dealer/change-password.html"
+                  class="btn btn-outline-primary w-100"
+                >
+                  <i class="fa-solid fa-key"></i> Change Password
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <div id="footer"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/frontend/shared/js/api.js"></script>
+    <script src="/frontend/shared/js/partials.js"></script>
+
+    <script>
+      (function () {
+        "use strict";
+
+        const loadingState = document.getElementById("loadingState");
+        const errorState = document.getElementById("errorState");
+        const contentState = document.getElementById("contentState");
+        const errorTitle = document.getElementById("errorTitle");
+        const errorMessage = document.getElementById("errorMessage");
+
+        function setText(id, value) {
+          document.getElementById(id).textContent =
+            value === null || value === undefined || value === "" ? "—" : value;
+        }
+
+        function formatDate(str) {
+          if (!str) return "—";
+          const parts = str.split(" ")[0].split("-");
+          if (parts.length !== 3) return str;
+          const months = [
+            "Jan",
+            "Feb",
+            "Mar",
+            "Apr",
+            "May",
+            "Jun",
+            "Jul",
+            "Aug",
+            "Sep",
+            "Oct",
+            "Nov",
+            "Dec",
+          ];
+          return (
+            parts[2] + " " + months[parseInt(parts[1], 10) - 1] + " " + parts[0]
+          );
+        }
+
+        function renderStatus(status) {
+          const card = document.getElementById("statusCard");
+          const badge = document.getElementById("statusBadge");
+          const badgeIcon = document.getElementById("statusBadgeIcon");
+          const badgeText = document.getElementById("statusBadgeText");
+          const headerIcon = document.getElementById("statusIcon");
+
+          card.className = "status-card";
+          badge.className = "status-card__badge";
+
+          let label = "Pending";
+          let icon = "fa-clock";
+
+          if (status === "approved") {
+            label = "Approved";
+            icon = "fa-circle-check";
+            card.classList.add("status-card--approved");
+            badge.classList.add("status-card__badge--approved");
+            headerIcon.style.color = "var(--status-success)";
+          } else if (status === "rejected") {
+            label = "Rejected";
+            icon = "fa-circle-xmark";
+            card.classList.add("status-card--rejected");
+            badge.classList.add("status-card__badge--rejected");
+            headerIcon.style.color = "var(--status-danger)";
+          } else {
+            label = "Pending";
+            icon = "fa-clock";
+            card.classList.add("status-card--pending");
+            badge.classList.add("status-card__badge--pending");
+            headerIcon.style.color = "var(--status-warning)";
+          }
+
+          badgeIcon.className = "fa-solid " + icon;
+          badgeText.textContent = label;
+        }
+
+        function renderProfile(dealer) {
+          setText("pUsername", dealer.username);
+          setText("pEmail", dealer.email);
+          setText("pBusinessName", dealer.business_name);
+          setText("pOwnerName", dealer.owner_name);
+          setText("pPhone", dealer.phone);
+          setText("pWhatsapp", dealer.whatsapp);
+          setText("pFullAddress", dealer.full_address);
+          setText("pProvince", dealer.province);
+          setText("pCity", dealer.city);
+          setText("pMemberSince", formatDate(dealer.created_at));
+
+          renderStatus(dealer.verification_status);
+        }
+
+        function showState(which) {
+          loadingState.style.display = which === "loading" ? "block" : "none";
+          errorState.style.display = which === "error" ? "block" : "none";
+          contentState.style.display = which === "content" ? "block" : "none";
+        }
+
+        async function loadProfile() {
+          showState("loading");
+
+          try {
+            const res = await API.requireAuth("dealer");
+            if (!res) return;
+
+            if (!res.success || !res.dealer) {
+              errorTitle.textContent = "Unable to load profile";
+              errorMessage.textContent = res.message || "Please try again.";
+              showState("error");
+              return;
+            }
+
+            renderProfile(res.dealer);
+            showState("content");
+          } catch (err) {
+            errorTitle.textContent = "Unable to load profile";
+            errorMessage.textContent =
+              "Please check your connection and try again.";
+            showState("error");
+          }
+        }
+
+        loadProfile();
+      })();
+    </script>
+  </body>
+</html>

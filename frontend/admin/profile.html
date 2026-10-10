@@ -1,0 +1,213 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>My Profile — Admin — Property Dealing</title>
+
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+      rel="stylesheet"
+    />
+    <link href="/frontend/shared/css/style.css" rel="stylesheet" />
+  </head>
+  <body>
+    <div id="navbar" data-navbar="admin"></div>
+
+    <main class="page-surface">
+      <div class="container-1320">
+        <!-- LOADING -->
+        <div id="loadingState">
+          <div
+            class="skeleton"
+            style="
+              height: 60px;
+              width: 40%;
+              margin-bottom: 24px;
+              border-radius: 8px;
+            "
+          ></div>
+          <div class="d-flex justify-content-center">
+            <div
+              class="skeleton"
+              style="
+                height: 480px;
+                width: 100%;
+                max-width: 640px;
+                border-radius: 12px;
+              "
+            ></div>
+          </div>
+        </div>
+
+        <!-- ERROR -->
+        <div id="errorState" style="display: none">
+          <div class="empty-state">
+            <i class="fa-regular fa-circle-xmark"></i>
+            <h5 id="errorTitle">Unable to load profile</h5>
+            <p id="errorMessage">Please refresh the page or try again later.</p>
+          </div>
+        </div>
+
+        <!-- CONTENT -->
+        <div id="contentState" style="display: none">
+          <!-- Page header -->
+          <div class="form-page-header">
+            <span class="form-page-header__icon"
+              ><i class="fa-regular fa-user"></i
+            ></span>
+            <div>
+              <h1>My Profile</h1>
+              <p class="text-muted-brand mb-0" style="font-size: 15px">
+                View your account information.
+              </p>
+            </div>
+          </div>
+
+          <!-- Centered card -->
+          <div class="admin-profile-wrapper">
+            <div class="admin-profile-card">
+              <div class="admin-profile-shield">
+                <i class="fa-solid fa-user-shield"></i>
+              </div>
+
+              <h2 class="admin-profile-title">Admin Account</h2>
+
+              <span class="admin-profile-role-badge" id="roleBadge">Admin</span>
+
+              <div class="admin-profile-rows">
+                <div class="admin-profile-row">
+                  <span class="admin-profile-row__label">Username</span>
+                  <span class="admin-profile-row__value" id="pUsername">—</span>
+                </div>
+
+                <div class="admin-profile-row">
+                  <span class="admin-profile-row__label">Admin ID</span>
+                  <span class="admin-profile-row__value" id="pAdminId">—</span>
+                </div>
+
+                <div class="admin-profile-row">
+                  <span class="admin-profile-row__label">Role</span>
+                  <span class="admin-profile-row__value" id="pRole">—</span>
+                </div>
+
+                <div class="admin-profile-row">
+                  <span class="admin-profile-row__label">Created At</span>
+                  <span class="admin-profile-row__value" id="pCreatedAt"
+                    >—</span
+                  >
+                </div>
+              </div>
+              <div class="mt-4">
+                <a
+                  href="/frontend/admin/change-password.html"
+                  class="btn btn-outline-primary w-100"
+                >
+                  <i class="fa-solid fa-key"></i> Change Password
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <div id="footer"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/frontend/shared/js/api.js"></script>
+    <script src="/frontend/shared/js/partials.js"></script>
+
+    <script>
+      (function () {
+        "use strict";
+
+        const loadingState = document.getElementById("loadingState");
+        const errorState = document.getElementById("errorState");
+        const contentState = document.getElementById("contentState");
+        const errorTitle = document.getElementById("errorTitle");
+        const errorMessage = document.getElementById("errorMessage");
+
+        function setText(id, value) {
+          document.getElementById(id).textContent =
+            value === null || value === undefined || value === "" ? "—" : value;
+        }
+
+        function formatDate(str) {
+          if (!str) return "—";
+          const parts = str.split(" ")[0].split("-");
+          if (parts.length !== 3) return str;
+          const months = [
+            "Jan",
+            "Feb",
+            "Mar",
+            "Apr",
+            "May",
+            "Jun",
+            "Jul",
+            "Aug",
+            "Sep",
+            "Oct",
+            "Nov",
+            "Dec",
+          ];
+          return (
+            parts[2] + " " + months[parseInt(parts[1], 10) - 1] + " " + parts[0]
+          );
+        }
+
+        function capitalize(str) {
+          if (!str) return "—";
+          return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+        }
+
+        function renderProfile(admin) {
+          setText("pUsername", admin.username);
+          setText("pAdminId", admin.admin_id);
+          setText("pRole", capitalize(admin.role || "admin"));
+          setText("pCreatedAt", formatDate(admin.created_at));
+
+          // Mirror the role text into the badge
+          const roleBadge = document.getElementById("roleBadge");
+          roleBadge.textContent = capitalize(admin.role || "admin");
+        }
+
+        function showState(which) {
+          loadingState.style.display = which === "loading" ? "block" : "none";
+          errorState.style.display = which === "error" ? "block" : "none";
+          contentState.style.display = which === "content" ? "block" : "none";
+        }
+
+        async function loadProfile() {
+          showState("loading");
+
+          try {
+            const res = await API.requireAuth("admin");
+            if (!res) return;
+
+            if (!res.success || !res.admin) {
+              errorTitle.textContent = "Unable to load profile";
+              errorMessage.textContent = res.message || "Please try again.";
+              showState("error");
+              return;
+            }
+
+            renderProfile(res.admin);
+            showState("content");
+          } catch (err) {
+            errorTitle.textContent = "Unable to load profile";
+            errorMessage.textContent =
+              "Please check your connection and try again.";
+            showState("error");
+          }
+        }
+
+        loadProfile();
+      })();
+    </script>
+  </body>
+</html>

@@ -1,0 +1,428 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>My Properties — Property Dealing</title>
+
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+      rel="stylesheet"
+    />
+    <link href="/frontend/shared/css/style.css" rel="stylesheet" />
+  </head>
+  <body>
+    <div id="navbar" data-navbar="dealer"></div>
+
+    <main class="page-surface">
+      <div class="container-1320">
+        <!-- LOADING -->
+        <div id="loadingState">
+          <div
+            class="skeleton"
+            style="
+              height: 60px;
+              width: 50%;
+              margin-bottom: 24px;
+              border-radius: 8px;
+            "
+          ></div>
+          <div
+            class="skeleton"
+            style="height: 420px; border-radius: 12px"
+          ></div>
+        </div>
+
+        <!-- ERROR -->
+        <div id="errorState" style="display: none">
+          <div class="empty-state">
+            <i class="fa-regular fa-circle-xmark"></i>
+            <h5 id="errorTitle">Unable to load properties</h5>
+            <p id="errorMessage">Please refresh the page or try again later.</p>
+          </div>
+        </div>
+
+        <!-- CONTENT -->
+        <div id="contentState" style="display: none">
+          <div class="page-header-row">
+            <div class="page-header-left">
+              <span class="page-icon"><i class="fa-solid fa-house"></i></span>
+              <h1>My Properties</h1>
+            </div>
+            <a
+              href="/frontend/dealer/add-property.html"
+              class="btn btn-primary"
+            >
+              <i class="fa-solid fa-plus"></i> Add New Property
+            </a>
+          </div>
+
+          <!-- Desktop / tablet table (md and up) -->
+          <div id="tableWrap" class="d-none d-md-block">
+            <table class="table-clean">
+              <thead>
+                <tr>
+                  <th style="width: 80px">Image</th>
+                  <th>Title</th>
+                  <th class="d-none d-lg-table-cell">Type</th>
+                  <th>Price</th>
+                  <th class="d-none d-lg-table-cell">Area</th>
+                  <th>Location</th>
+                  <th style="width: 90px">Views</th>
+                  <th>Status</th>
+                  <th style="width: 200px">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="tableBody">
+                <!-- rows injected by JS -->
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Mobile stacked cards (below md) -->
+          <div id="cardsWrap" class="d-block d-md-none">
+            <!-- cards injected by JS -->
+          </div>
+
+          <!-- Empty state -->
+          <div id="emptyState" class="empty-state" style="display: none">
+            <i class="fa-regular fa-house"></i>
+            <h5>No properties yet.</h5>
+            <p>Add your first listing.</p>
+            <a
+              href="/frontend/dealer/add-property.html"
+              class="btn btn-primary"
+            >
+              <i class="fa-solid fa-plus"></i> Add New Property
+            </a>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <div id="footer"></div>
+
+    <!-- Confirm modal -->
+    <div class="modal fade" id="confirmModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-body text-center p-4">
+            <div class="confirm-modal-icon">
+              <i class="fa-solid fa-circle-check" id="confirmIcon"></i>
+            </div>
+            <h5 id="confirmTitle" class="mb-2">Mark this property as sold?</h5>
+            <p id="confirmText" class="text-muted-brand mb-4">
+              Buyers will no longer see it as available.
+            </p>
+            <div class="d-flex gap-2 justify-content-center">
+              <button
+                type="button"
+                class="btn btn-ghost px-4"
+                data-bs-dismiss="modal"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                class="btn btn-primary px-4"
+                id="confirmBtn"
+              >
+                Confirm
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/frontend/shared/js/api.js"></script>
+    <script src="/frontend/shared/js/partials.js"></script>
+
+    <script>
+      (function () {
+        "use strict";
+
+        const loadingState = document.getElementById("loadingState");
+        const errorState = document.getElementById("errorState");
+        const contentState = document.getElementById("contentState");
+        const errorTitle = document.getElementById("errorTitle");
+        const errorMessage = document.getElementById("errorMessage");
+
+        const tableWrap = document.getElementById("tableWrap");
+        const cardsWrap = document.getElementById("cardsWrap");
+        const tableBody = document.getElementById("tableBody");
+        const emptyState = document.getElementById("emptyState");
+
+        const confirmModalEl = document.getElementById("confirmModal");
+        const confirmModal = new bootstrap.Modal(confirmModalEl);
+        const confirmTitle = document.getElementById("confirmTitle");
+        const confirmText = document.getElementById("confirmText");
+        const confirmIcon = document.getElementById("confirmIcon");
+        const confirmBtn = document.getElementById("confirmBtn");
+
+        let properties = [];
+        let pendingAction = null;
+
+        function statusBadgeHtml(status) {
+          const cls = status === "sold" ? "badge-sold" : "badge-unsold";
+          const label = status === "sold" ? "Sold" : "Unsold";
+          return (
+            '<span class="badge-pill-custom ' + cls + '">' + label + "</span>"
+          );
+        }
+
+        function imageFallbackHtml() {
+          return (
+            '<div class="img-fallback" style="width:60px;height:42px;min-height:0;border-radius:8px;">' +
+            '<i class="fa-regular fa-image" style="font-size:16px;"></i></div>'
+          );
+        }
+
+        function buildTableRow(p) {
+          const img =
+            p.images && p.images.length > 0
+              ? '<img class="prop-thumb" src="' +
+                API.imageUrl(p.images[0].image_path) +
+                '" alt="Property image">'
+              : imageFallbackHtml();
+
+          const editUrl =
+            "/frontend/dealer/edit-property.html?property_id=" + p.property_id;
+          const toggleLabel =
+            p.property_status === "sold" ? "Mark as Unsold" : "Mark as Sold";
+          const locationText =
+            API.escapeHTML(p.city) + ", " + API.escapeHTML(p.province);
+
+          return (
+            "<tr>" +
+            "<td>" +
+            img +
+            "</td>" +
+            '<td class="title-cell">' +
+            API.escapeHTML(p.title) +
+            "</td>" +
+            '<td class="d-none d-lg-table-cell">' +
+            API.escapeHTML(p.property_type) +
+            "</td>" +
+            '<td class="price-cell">' +
+            API.formatPrice(p.price) +
+            "</td>" +
+            '<td class="d-none d-lg-table-cell">' +
+            API.escapeHTML(p.area_size) +
+            " " +
+            API.escapeHTML(p.area_unit) +
+            '<td class="location-cell">' +
+            locationText +
+            "</td>" +
+            '<td><i class="fa-regular fa-eye" style="color:var(--brand-muted);font-size:12px;"></i> ' +
+            (p.views || 0) +
+            "</td>" +
+            "<td>" +
+            statusBadgeHtml(p.property_status) +
+            "</td>" +
+            '<td class="actions-cell">' +
+            '<a href="' +
+            editUrl +
+            '" class="btn btn-sm btn-outline-primary">Edit</a>' +
+            '<button type="button" class="btn btn-sm btn-ghost toggle-btn" data-id="' +
+            p.property_id +
+            '">' +
+            toggleLabel +
+            "</button>" +
+            "</td>" +
+            "</tr>"
+          );
+        }
+
+        function buildMobileCard(p) {
+          const img =
+            p.images && p.images.length > 0
+              ? '<img src="' +
+                API.imageUrl(p.images[0].image_path) +
+                '" alt="Property image">'
+              : imageFallbackHtml();
+
+          const editUrl =
+            "/frontend/dealer/edit-property.html?property_id=" + p.property_id;
+          const toggleLabel =
+            p.property_status === "sold" ? "Mark as Unsold" : "Mark as Sold";
+          const locationText =
+            API.escapeHTML(p.city) + ", " + API.escapeHTML(p.province);
+
+          return (
+            '<div class="prop-mobile-card">' +
+            '<div class="prop-mobile-card__header">' +
+            img +
+            '<div style="min-width:0;flex:1;">' +
+            '<h3 class="prop-mobile-card__title">' +
+            API.escapeHTML(p.title) +
+            "</h3>" +
+            '<p class="prop-mobile-card__price">' +
+            API.formatPrice(p.price) +
+            "</p>" +
+            '<p class="prop-mobile-card__meta">' +
+            API.escapeHTML(p.area_size) +
+            " " +
+            API.escapeHTML(p.area_unit) +
+            " | " +
+            API.escapeHTML(p.property_type) +
+            "</p>" +
+            '<p class="prop-mobile-card__meta mb-0">' +
+            locationText +
+            "</p>" +
+            '<p class="prop-mobile-card__meta mb-0" style="color:var(--brand-primary);font-weight:600;">' +
+            '<i class="fa-regular fa-eye" style="font-size:12px;"></i> ' +
+            (p.views || 0) +
+            " views" +
+            "</p>" +
+            '<div class="mt-2">' +
+            statusBadgeHtml(p.property_status) +
+            "</div>" +
+            "</div>" +
+            "</div>" +
+            '<div class="prop-mobile-card__footer">' +
+            '<a href="' +
+            editUrl +
+            '" class="btn btn-outline-primary btn-sm">Edit</a>' +
+            '<button type="button" class="btn btn-ghost btn-sm toggle-btn" data-id="' +
+            p.property_id +
+            '">' +
+            toggleLabel +
+            "</button>" +
+            "</div>" +
+            "</div>"
+          );
+        }
+
+        function renderAll() {
+          if (properties.length === 0) {
+            tableWrap.style.display = "none";
+            cardsWrap.style.display = "none";
+            emptyState.style.display = "block";
+            return;
+          }
+
+          tableWrap.style.display = "";
+          cardsWrap.style.display = "";
+          emptyState.style.display = "none";
+
+          tableBody.innerHTML = properties.map(buildTableRow).join("");
+          cardsWrap.innerHTML = properties.map(buildMobileCard).join("");
+
+          document.querySelectorAll(".toggle-btn").forEach(function (btn) {
+            btn.addEventListener("click", function () {
+              const id = parseInt(btn.getAttribute("data-id"), 10);
+              const prop = properties.find(function (p) {
+                return p.property_id === id;
+              });
+              if (!prop) return;
+              openConfirmToggle(prop);
+            });
+          });
+        }
+
+        function openConfirmToggle(prop) {
+          const isSold = prop.property_status === "sold";
+
+          if (isSold) {
+            confirmTitle.textContent = "Mark this property as Unsold?";
+            confirmText.textContent = "Buyers will see it as available again.";
+            confirmIcon.className = "fa-solid fa-circle-check";
+            confirmIcon.parentElement.style.background = "#E7F0FF";
+            confirmIcon.parentElement.style.color = "var(--brand-primary)";
+          } else {
+            confirmTitle.textContent = "Mark this property as Sold?";
+            confirmText.textContent =
+              "Buyers will no longer see it as available.";
+            confirmIcon.className = "fa-solid fa-circle-check";
+            confirmIcon.parentElement.style.background = "#E5F4EC";
+            confirmIcon.parentElement.style.color = "var(--status-success)";
+          }
+
+          pendingAction = {
+            property_id: prop.property_id,
+            new_status: isSold ? "unsold" : "sold",
+          };
+
+          confirmModal.show();
+        }
+
+        confirmBtn.addEventListener("click", async function () {
+          if (!pendingAction) return;
+
+          confirmBtn.disabled = true;
+          confirmBtn.innerHTML =
+            '<span class="spinner-border spinner-border-sm me-2"></span> Updating...';
+
+          try {
+            const res = await API.post("/dealer/toggle-property-status.php", {
+              property_id: pendingAction.property_id,
+              property_status: pendingAction.new_status,
+            });
+
+            if (res.success) {
+              confirmModal.hide();
+              API.showToast("Property status updated.", "success");
+              // Update local state
+              const prop = properties.find(function (p) {
+                return p.property_id === pendingAction.property_id;
+              });
+              if (prop) prop.property_status = pendingAction.new_status;
+              renderAll();
+            } else {
+              API.showToast(
+                res.message || "Unable to update property.",
+                "error",
+              );
+            }
+          } catch (err) {
+            API.showToast("Unable to update. Please try again.", "error");
+          } finally {
+            confirmBtn.disabled = false;
+            confirmBtn.innerHTML = "Confirm";
+            pendingAction = null;
+          }
+        });
+
+        function showState(which) {
+          loadingState.style.display = which === "loading" ? "block" : "none";
+          errorState.style.display = which === "error" ? "block" : "none";
+          contentState.style.display = which === "content" ? "block" : "none";
+        }
+
+        async function loadProperties() {
+          showState("loading");
+
+          try {
+            const auth = await API.requireAuth("dealer");
+            if (!auth) return;
+
+            const res = await API.get("/dealer/list-my-properties.php");
+            if (!res.success) {
+              errorTitle.textContent = "Unable to load properties";
+              errorMessage.textContent = res.message || "Please try again.";
+              showState("error");
+              return;
+            }
+
+            properties = res.properties || [];
+            renderAll();
+            showState("content");
+          } catch (err) {
+            errorTitle.textContent = "Unable to load properties";
+            errorMessage.textContent =
+              "Please check your connection and try again.";
+            showState("error");
+          }
+        }
+
+        loadProperties();
+      })();
+    </script>
+  </body>
+</html>

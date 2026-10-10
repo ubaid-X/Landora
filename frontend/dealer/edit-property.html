@@ -1,0 +1,1181 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Edit Property — Property Dealing</title>
+
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+      rel="stylesheet"
+    />
+    <link href="/frontend/shared/css/style.css" rel="stylesheet" />
+  </head>
+  <body>
+    <div id="navbar" data-navbar="dealer"></div>
+
+    <main class="page-surface">
+      <div class="container-1320">
+        <a href="/frontend/dealer/my-properties.html" class="back-link">
+          <i class="fa-solid fa-arrow-left"></i> Back to My Properties
+        </a>
+
+        <!-- LOADING -->
+        <div id="loadingState">
+          <div
+            class="skeleton"
+            style="
+              height: 60px;
+              width: 50%;
+              margin-bottom: 24px;
+              border-radius: 8px;
+            "
+          ></div>
+          <div
+            class="skeleton"
+            style="height: 260px; border-radius: 12px; margin-bottom: 24px"
+          ></div>
+          <div
+            class="skeleton"
+            style="height: 260px; border-radius: 12px; margin-bottom: 24px"
+          ></div>
+          <div
+            class="skeleton"
+            style="height: 200px; border-radius: 12px"
+          ></div>
+        </div>
+
+        <!-- ERROR -->
+        <div id="errorState" style="display: none">
+          <div class="empty-state">
+            <i class="fa-regular fa-circle-xmark"></i>
+            <h5 id="errorTitle">Unable to load property</h5>
+            <p id="errorMessage">Please go back and try again.</p>
+            <a
+              href="/frontend/dealer/my-properties.html"
+              class="btn btn-primary"
+            >
+              <i class="fa-solid fa-arrow-left"></i> Back to My Properties
+            </a>
+          </div>
+        </div>
+
+        <!-- CONTENT -->
+        <div id="contentState" style="display: none">
+          <div class="form-page-header">
+            <span class="form-page-header__icon"
+              ><i class="fa-solid fa-house"></i
+            ></span>
+            <h1>Edit Property</h1>
+            <span class="property-id-badge"
+              >Property ID: #<span id="propertyIdBadge">—</span></span
+            >
+          </div>
+
+          <div class="privacy-legend">
+            <span class="privacy-legend__item">
+              <i class="fa-solid fa-lock"></i> Private — visible to admin only
+            </span>
+            <span class="privacy-legend__item">
+              <i class="fa-solid fa-globe"></i> Public — shown on your listing
+            </span>
+          </div>
+
+          <div
+            id="formAlert"
+            class="alert"
+            style="display: none"
+            role="alert"
+          ></div>
+
+          <form id="editPropertyForm" novalidate>
+            <!-- SECTION 1 -->
+            <div class="form-section">
+              <div class="form-section__header">
+                <span class="form-section__number">1</span>
+                <i class="fa-solid fa-lock form-section__icon"></i>
+                <h2 class="form-section__title">Property Information</h2>
+              </div>
+
+              <div class="row g-3">
+                <div class="col-12 col-md-6">
+                  <label for="title" class="form-label"
+                    >Title <span class="req">*</span></label
+                  >
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="title"
+                    name="title"
+                  />
+                  <div class="invalid-feedback"></div>
+                </div>
+
+                <div class="col-12 col-md-6">
+                  <label for="price" class="form-label"
+                    >Price <span class="req">*</span></label
+                  >
+                  <div class="input-with-prefix" id="priceWrap">
+                    <span class="input-with-prefix__prefix">Rs.</span>
+                    <input
+                      type="number"
+                      class="form-control"
+                      id="price"
+                      name="price"
+                      min="1"
+                      step="any"
+                    />
+                  </div>
+                  <div class="invalid-feedback" id="priceFeedback"></div>
+                </div>
+
+                <div class="col-12 col-md-6">
+                  <label for="areaSize" class="form-label"
+                    >Area Size <span class="req">*</span></label
+                  >
+                  <input
+                    type="number"
+                    class="form-control"
+                    id="areaSize"
+                    name="area_size"
+                    min="0.01"
+                    step="any"
+                  />
+                  <div class="invalid-feedback"></div>
+                </div>
+
+                <div class="col-12 col-md-6">
+                  <label for="areaUnit" class="form-label"
+                    >Area Unit <span class="req">*</span></label
+                  >
+                  <select class="form-select" id="areaUnit" name="area_unit">
+                    <option value="">Select area unit</option>
+                    <option value="Marla">Marla</option>
+                    <option value="Kanal">Kanal</option>
+                    <option value="Sq Ft">Sq Ft</option>
+                    <option value="Sq Yd">Sq Yd</option>
+                  </select>
+                  <div class="invalid-feedback"></div>
+                </div>
+
+                <div class="col-12 col-md-6">
+                  <label for="propertyType" class="form-label"
+                    >Property Type <span class="req">*</span></label
+                  >
+                  <select
+                    class="form-select"
+                    id="propertyType"
+                    name="property_type"
+                  >
+                    <option value="">Select property type</option>
+                    <option value="House">House</option>
+                    <option value="Plot">Plot</option>
+                    <option value="Shop">Shop</option>
+                    <option value="Office">Office</option>
+                    <option value="Building">Building</option>
+                    <option value="Agricultural">Agricultural</option>
+                  </select>
+                  <div class="invalid-feedback"></div>
+                </div>
+
+                <div class="col-12">
+                  <label for="description" class="form-label"
+                    >Description <span class="req">*</span></label
+                  >
+                  <textarea
+                    class="form-control"
+                    id="description"
+                    name="description"
+                    rows="4"
+                  ></textarea>
+                  <div class="invalid-feedback"></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- SECTION 2 -->
+            <div class="form-section">
+              <div class="form-section__header">
+                <span class="form-section__number">2</span>
+                <i class="fa-solid fa-location-dot form-section__icon"></i>
+                <h2 class="form-section__title">Location</h2>
+              </div>
+
+              <div class="row g-3">
+                <div class="col-12 col-md-6">
+                  <label for="fullAddress" class="form-label"
+                    >Full Address <span class="req">*</span></label
+                  >
+                  <textarea
+                    class="form-control"
+                    id="fullAddress"
+                    name="address"
+                    rows="3"
+                  ></textarea>
+                  <div class="field-hint field-hint--private">
+                    <i class="fa-solid fa-lock"></i> Private — visible to admin
+                    only.
+                  </div>
+                  <div class="invalid-feedback"></div>
+                </div>
+
+                <div class="col-12 col-md-6">
+                  <label for="province" class="form-label"
+                    >Province <span class="req">*</span></label
+                  >
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="province"
+                    name="province"
+                  />
+                  <div class="field-hint field-hint--public">
+                    <i class="fa-solid fa-globe"></i> Public — shown on your
+                    listing.
+                  </div>
+                  <div class="invalid-feedback"></div>
+                </div>
+
+                <div class="col-12 col-md-6">
+                  <label for="city" class="form-label"
+                    >City <span class="req">*</span></label
+                  >
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="city"
+                    name="city"
+                  />
+                  <div class="field-hint field-hint--public">
+                    <i class="fa-solid fa-globe"></i> Public — shown on your
+                    listing.
+                  </div>
+                  <div class="invalid-feedback"></div>
+                </div>
+
+                <div class="col-12 col-md-6">
+                  <label for="googleMapUrl" class="form-label"
+                    >Map Location <span class="req">*</span></label
+                  >
+                  <div class="location-field">
+                    <input
+                      type="text"
+                      class="form-control"
+                      id="googleMapUrl"
+                      name="google_map_url"
+                      placeholder="Click Select Location to pick on the map"
+                      readonly
+                    />
+                    <button
+                      type="button"
+                      class="btn btn-primary"
+                      id="selectLocationBtn"
+                    >
+                      <i class="fa-solid fa-map-location-dot"></i> Select
+                      Location
+                    </button>
+                  </div>
+                  <div class="location-url-display" id="locationUrlDisplay">
+                    <span class="text-muted-brand"
+                      >No location selected yet.</span
+                    >
+                  </div>
+                  <div class="invalid-feedback" id="mapUrlFeedback"></div>
+                  <div class="field-hint field-hint--private mt-2">
+                    <i class="fa-solid fa-lock"></i> Private — visible to admin
+                    only.
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- SECTION 3 -->
+            <div class="form-section">
+              <div class="form-section__header">
+                <span class="form-section__number">3</span>
+                <i class="fa-regular fa-image form-section__icon"></i>
+                <h2 class="form-section__title">Images</h2>
+              </div>
+
+              <div class="upload-zone" id="uploadZone">
+                <i class="fa-solid fa-cloud-arrow-up upload-zone__icon"></i>
+                <p class="upload-zone__title">Drag &amp; drop images here</p>
+                <p class="upload-zone__sub">or</p>
+                <button
+                  type="button"
+                  class="upload-zone__btn"
+                  id="chooseFilesBtn"
+                >
+                  <i class="fa-solid fa-folder-open"></i> Choose Files
+                </button>
+                <p class="upload-zone__sub mt-3 mb-0">
+                  JPG, PNG, WEBP (Max 5 MB each, up to 10 images per property)
+                </p>
+                <input
+                  type="file"
+                  id="fileInput"
+                  multiple
+                  accept="image/jpeg,image/png,image/webp"
+                  hidden
+                />
+              </div>
+
+              <div class="image-previews" id="imagePreviews"></div>
+
+              <div class="upload-info-banner">
+                <i class="fa-solid fa-circle-info"></i>
+                <div>
+                  You can upload multiple images. The first image will be used
+                  as the main thumbnail.
+                </div>
+              </div>
+            </div>
+
+            <div class="form-actions">
+              <button type="submit" class="btn btn-primary btn-lg" id="saveBtn">
+                <i class="fa-regular fa-floppy-disk"></i> Save Changes
+              </button>
+              <a
+                href="/frontend/dealer/my-properties.html"
+                class="btn btn-ghost btn-lg"
+                >Cancel</a
+              >
+            </div>
+          </form>
+        </div>
+      </div>
+    </main>
+
+    <div id="footer"></div>
+
+    <!-- LOCATION PICKER MODAL -->
+    <div class="modal fade" id="mapModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Select Property Location</h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <p class="map-modal-hint">
+              <i class="fa-solid fa-circle-info"></i>
+              Search for an area or click anywhere on the map to place the pin.
+              Drag the pin to adjust.
+            </p>
+
+            <div class="map-search-wrapper">
+              <i class="fa-solid fa-magnifying-glass"></i>
+              <input
+                type="text"
+                id="mapSearchInput"
+                placeholder="Search area, city, or landmark..."
+                autocomplete="off"
+              />
+              <div class="map-search-results" id="mapSearchResults"></div>
+            </div>
+
+            <div id="mapPicker"></div>
+
+            <div
+              class="map-selected-info"
+              id="mapSelectedInfo"
+              style="display: none"
+            >
+              <i class="fa-solid fa-location-dot"></i>
+              <span id="mapSelectedAddress"></span>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-ghost" data-bs-dismiss="modal">
+              Cancel
+            </button>
+            <button
+              type="button"
+              class="btn btn-primary"
+              id="confirmLocationBtn"
+              disabled
+            >
+              <i class="fa-solid fa-check"></i> Confirm Location
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="/frontend/shared/js/api.js"></script>
+    <script src="/frontend/shared/js/partials.js"></script>
+
+    <script>
+      (function () {
+        "use strict";
+
+        const MAX_FILE_SIZE = 5 * 1024 * 1024;
+        const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp"];
+        const NOMINATIM_EMAIL = "admin@example.com";
+
+        const loadingState = document.getElementById("loadingState");
+        const errorState = document.getElementById("errorState");
+        const contentState = document.getElementById("contentState");
+        const errorTitle = document.getElementById("errorTitle");
+        const errorMessage = document.getElementById("errorMessage");
+
+        const propertyIdBadge = document.getElementById("propertyIdBadge");
+
+        const form = document.getElementById("editPropertyForm");
+        const formAlert = document.getElementById("formAlert");
+        const saveBtn = document.getElementById("saveBtn");
+
+        const uploadZone = document.getElementById("uploadZone");
+        const chooseBtn = document.getElementById("chooseFilesBtn");
+        const fileInput = document.getElementById("fileInput");
+        const previewsEl = document.getElementById("imagePreviews");
+
+        const fields = {
+          title: document.getElementById("title"),
+          price: document.getElementById("price"),
+          priceWrap: document.getElementById("priceWrap"),
+          priceFeedback: document.getElementById("priceFeedback"),
+          area_size: document.getElementById("areaSize"),
+          area_unit: document.getElementById("areaUnit"),
+          property_type: document.getElementById("propertyType"),
+          description: document.getElementById("description"),
+          address: document.getElementById("fullAddress"),
+          province: document.getElementById("province"),
+          city: document.getElementById("city"),
+          google_map_url: document.getElementById("googleMapUrl"),
+        };
+
+        let propertyId = 0;
+        let existingImages = []; // [{ image_id, image_path }, ...]
+        let newFiles = []; // File objects queued for upload
+
+        // --------------------------------------------------
+        // Alerts
+        // --------------------------------------------------
+        function hideAlert() {
+          formAlert.style.display = "none";
+          formAlert.className = "alert";
+          formAlert.textContent = "";
+        }
+        function showAlert(type, message) {
+          formAlert.className = "alert alert-" + type;
+          formAlert.textContent = message;
+          formAlert.style.display = "flex";
+          formAlert.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
+
+        // --------------------------------------------------
+        // Field errors
+        // --------------------------------------------------
+        function setError(key, message) {
+          const el = fields[key];
+          if (!el) return;
+          if (key === "price") {
+            fields.priceWrap.classList.add("is-invalid");
+            fields.priceFeedback.textContent = message;
+            return;
+          }
+          if (key === "google_map_url") {
+            el.classList.add("is-invalid");
+            const fb = document.getElementById("mapUrlFeedback");
+            if (fb) fb.textContent = message;
+            return;
+          }
+          el.classList.add("is-invalid");
+          const fb = el.parentElement.querySelector(".invalid-feedback");
+          if (fb) fb.textContent = message;
+        }
+        function clearError(key) {
+          const el = fields[key];
+          if (!el) return;
+          if (key === "price") {
+            fields.priceWrap.classList.remove("is-invalid");
+            fields.priceFeedback.textContent = "";
+            return;
+          }
+          if (key === "google_map_url") {
+            el.classList.remove("is-invalid");
+            const fb = document.getElementById("mapUrlFeedback");
+            if (fb) fb.textContent = "";
+            return;
+          }
+          el.classList.remove("is-invalid");
+          const fb = el.parentElement.querySelector(".invalid-feedback");
+          if (fb) fb.textContent = "";
+        }
+        function clearAllErrors() {
+          Object.keys(fields).forEach(clearError);
+          hideAlert();
+        }
+
+        // --------------------------------------------------
+        // Images — existing + new files
+        // --------------------------------------------------
+        function renderImages() {
+          const existingHtml = existingImages
+            .map(function (img, i) {
+              return (
+                '<div class="image-preview">' +
+                '<span class="existing-image-badge">Saved</span>' +
+                '<img src="' +
+                API.imageUrl(img.image_path) +
+                '" alt="Saved image ' +
+                (i + 1) +
+                '">' +
+                '<button type="button" class="image-preview__remove existing-remove-btn" ' +
+                'data-image-id="' +
+                img.image_id +
+                '" aria-label="Remove image">' +
+                '<i class="fa-solid fa-xmark"></i>' +
+                "</button>" +
+                "</div>"
+              );
+            })
+            .join("");
+
+          const newHtml = newFiles
+            .map(function (file, i) {
+              const url = URL.createObjectURL(file);
+              return (
+                '<div class="image-preview">' +
+                '<img src="' +
+                url +
+                '" alt="New image ' +
+                (i + 1) +
+                '">' +
+                '<button type="button" class="image-preview__remove new-remove-btn" ' +
+                'data-index="' +
+                i +
+                '" aria-label="Remove image">' +
+                '<i class="fa-solid fa-xmark"></i>' +
+                "</button>" +
+                "</div>"
+              );
+            })
+            .join("");
+
+          previewsEl.innerHTML = existingHtml + newHtml;
+
+          // Wire existing remove buttons → immediate backend delete
+          previewsEl
+            .querySelectorAll(".existing-remove-btn")
+            .forEach(function (btn) {
+              btn.addEventListener("click", function () {
+                const imageId = parseInt(btn.getAttribute("data-image-id"), 10);
+                removeExistingImage(imageId);
+              });
+            });
+
+          // Wire new file remove buttons → just drop from queue
+          previewsEl
+            .querySelectorAll(".new-remove-btn")
+            .forEach(function (btn) {
+              btn.addEventListener("click", function () {
+                const idx = parseInt(btn.getAttribute("data-index"), 10);
+                newFiles.splice(idx, 1);
+                renderImages();
+              });
+            });
+        }
+
+        async function removeExistingImage(imageId) {
+          if (!confirm("Remove this image? This cannot be undone.")) return;
+
+          try {
+            const res = await API.post("/dealer/delete-property-image.php", {
+              image_id: imageId,
+            });
+            if (res.success) {
+              existingImages = existingImages.filter(function (img) {
+                return img.image_id !== imageId;
+              });
+              renderImages();
+              API.showToast("Image removed.", "success");
+            } else {
+              API.showToast(res.message || "Unable to remove image.", "error");
+            }
+          } catch (_) {
+            API.showToast("Unable to remove image. Please try again.", "error");
+          }
+        }
+
+        function addFiles(files) {
+          const valid = [];
+          Array.from(files).forEach(function (file) {
+            if (ALLOWED_TYPES.indexOf(file.type) === -1) {
+              showAlert(
+                "danger",
+                '"' + file.name + '" is not a JPG, PNG, or WEBP image.',
+              );
+              return;
+            }
+            if (file.size > MAX_FILE_SIZE) {
+              showAlert("danger", '"' + file.name + '" exceeds 5 MB.');
+              return;
+            }
+            valid.push(file);
+          });
+          if (valid.length > 0) {
+            newFiles = newFiles.concat(valid);
+            renderImages();
+          }
+        }
+
+        chooseBtn.addEventListener("click", function (e) {
+          e.stopPropagation();
+          fileInput.click();
+        });
+        uploadZone.addEventListener("click", function (e) {
+          if (e.target === chooseBtn || chooseBtn.contains(e.target)) return;
+          fileInput.click();
+        });
+        fileInput.addEventListener("change", function () {
+          addFiles(fileInput.files);
+          fileInput.value = "";
+        });
+        ["dragenter", "dragover"].forEach(function (evt) {
+          uploadZone.addEventListener(evt, function (e) {
+            e.preventDefault();
+            uploadZone.classList.add("dragover");
+          });
+        });
+        ["dragleave", "drop"].forEach(function (evt) {
+          uploadZone.addEventListener(evt, function (e) {
+            e.preventDefault();
+            uploadZone.classList.remove("dragover");
+          });
+        });
+        uploadZone.addEventListener("drop", function (e) {
+          if (e.dataTransfer && e.dataTransfer.files)
+            addFiles(e.dataTransfer.files);
+        });
+
+        // --------------------------------------------------
+        // LOCATION PICKER (same as Add Property)
+        // --------------------------------------------------
+        let mapPicker = null;
+        let mapMarker = null;
+        let selectedCoords = null;
+        let searchDebounceTimer = null;
+        let mapInitialized = false;
+
+        const mapModalEl = document.getElementById("mapModal");
+        const mapModal = new bootstrap.Modal(mapModalEl);
+        const mapSearchInput = document.getElementById("mapSearchInput");
+        const mapSearchResults = document.getElementById("mapSearchResults");
+        const mapSelectedInfo = document.getElementById("mapSelectedInfo");
+        const mapSelectedAddr = document.getElementById("mapSelectedAddress");
+        const confirmLocationBtn =
+          document.getElementById("confirmLocationBtn");
+        const locationUrlDisplay =
+          document.getElementById("locationUrlDisplay");
+
+        document
+          .getElementById("selectLocationBtn")
+          .addEventListener("click", function () {
+            mapModal.show();
+          });
+
+        mapModalEl.addEventListener("shown.bs.modal", function () {
+          if (!mapInitialized) {
+            initMapPicker();
+            mapInitialized = true;
+          } else {
+            setTimeout(function () {
+              mapPicker.invalidateSize();
+            }, 100);
+          }
+        });
+
+        function initMapPicker() {
+          mapPicker = L.map("mapPicker").setView([30.3753, 69.3451], 6);
+
+          L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+            maxZoom: 19,
+            attribution: "&copy; OpenStreetMap contributors",
+          }).addTo(mapPicker);
+
+          mapPicker.on("click", function (e) {
+            placeMarkerAndReverseGeocode(e.latlng.lat, e.latlng.lng);
+          });
+
+          // If a URL already exists (edit page), place the marker
+          const existing = fields.google_map_url.value.trim();
+          if (existing) {
+            const coords = extractCoordsFromUrl(existing);
+            if (coords) placeMarkerAndReverseGeocode(coords.lat, coords.lng);
+          }
+        }
+
+        function placeMarkerAndReverseGeocode(lat, lng) {
+          if (mapMarker) {
+            mapMarker.setLatLng([lat, lng]);
+          } else {
+            mapMarker = L.marker([lat, lng], { draggable: true }).addTo(
+              mapPicker,
+            );
+            mapMarker.on("dragend", function () {
+              const pos = mapMarker.getLatLng();
+              reverseGeocode(pos.lat, pos.lng);
+              selectedCoords = { lat: pos.lat, lng: pos.lng };
+            });
+          }
+          selectedCoords = { lat: lat, lng: lng };
+          mapPicker.setView([lat, lng], 15);
+          reverseGeocode(lat, lng);
+        }
+
+        function reverseGeocode(lat, lng) {
+          mapSelectedInfo.style.display = "none";
+          confirmLocationBtn.disabled = true;
+
+          const url =
+            "https://nominatim.openstreetmap.org/reverse?format=json" +
+            "&lat=" +
+            lat +
+            "&lon=" +
+            lng +
+            "&zoom=18&addressdetails=1&email=" +
+            encodeURIComponent(NOMINATIM_EMAIL);
+
+          fetch(url)
+            .then(function (r) {
+              return r.json();
+            })
+            .then(function (data) {
+              const name =
+                data && data.display_name
+                  ? data.display_name
+                  : lat.toFixed(5) + ", " + lng.toFixed(5);
+              mapSelectedAddr.textContent = name;
+              mapSelectedInfo.style.display = "flex";
+              confirmLocationBtn.disabled = false;
+            })
+            .catch(function () {
+              mapSelectedAddr.textContent =
+                lat.toFixed(5) + ", " + lng.toFixed(5);
+              mapSelectedInfo.style.display = "flex";
+              confirmLocationBtn.disabled = false;
+            });
+        }
+
+        function extractCoordsFromUrl(url) {
+          const patterns = [
+            /[?&]q=(-?\d+\.\d+),(-?\d+\.\d+)/,
+            /@(-?\d+\.\d+),(-?\d+\.\d+)/,
+            /[?&]ll=(-?\d+\.\d+),(-?\d+\.\d+)/,
+          ];
+          for (let i = 0; i < patterns.length; i++) {
+            const m = url.match(patterns[i]);
+            if (m) return { lat: parseFloat(m[1]), lng: parseFloat(m[2]) };
+          }
+          return null;
+        }
+
+        mapSearchInput.addEventListener("input", function () {
+          const q = mapSearchInput.value.trim();
+          clearTimeout(searchDebounceTimer);
+          if (q.length < 3) {
+            mapSearchResults.classList.remove("show");
+            mapSearchResults.innerHTML = "";
+            return;
+          }
+          searchDebounceTimer = setTimeout(function () {
+            performSearch(q);
+          }, 500);
+        });
+
+        function performSearch(query) {
+          mapSearchResults.innerHTML =
+            '<div class="map-search-empty"><span class="spinner-border spinner-border-sm me-2"></span>Searching...</div>';
+          mapSearchResults.classList.add("show");
+
+          const url =
+            "https://nominatim.openstreetmap.org/search?format=json" +
+            "&q=" +
+            encodeURIComponent(query) +
+            "&limit=5&countrycodes=pk&addressdetails=1" +
+            "&email=" +
+            encodeURIComponent(NOMINATIM_EMAIL);
+
+          fetch(url)
+            .then(function (r) {
+              return r.json();
+            })
+            .then(function (data) {
+              if (!data || data.length === 0) {
+                mapSearchResults.innerHTML =
+                  '<div class="map-search-empty">No results found.</div>';
+                return;
+              }
+              mapSearchResults.innerHTML = data
+                .map(function (item) {
+                  return (
+                    '<div class="map-search-result-item" data-lat="' +
+                    item.lat +
+                    '" data-lon="' +
+                    item.lon +
+                    '">' +
+                    '<i class="fa-solid fa-location-dot"></i>' +
+                    API.escapeHTML(item.display_name) +
+                    "</div>"
+                  );
+                })
+                .join("");
+
+              mapSearchResults
+                .querySelectorAll(".map-search-result-item")
+                .forEach(function (el) {
+                  el.addEventListener("click", function () {
+                    const lat = parseFloat(el.getAttribute("data-lat"));
+                    const lng = parseFloat(el.getAttribute("data-lon"));
+                    mapSearchInput.value = "";
+                    mapSearchResults.classList.remove("show");
+                    mapSearchResults.innerHTML = "";
+                    placeMarkerAndReverseGeocode(lat, lng);
+                  });
+                });
+            })
+            .catch(function () {
+              mapSearchResults.innerHTML =
+                '<div class="map-search-empty">Search failed. Try again.</div>';
+            });
+        }
+
+        document.addEventListener("click", function (e) {
+          if (
+            !mapSearchResults.contains(e.target) &&
+            e.target !== mapSearchInput
+          ) {
+            mapSearchResults.classList.remove("show");
+          }
+        });
+
+        confirmLocationBtn.addEventListener("click", function () {
+          if (!selectedCoords) return;
+          const url =
+            "https://www.google.com/maps?q=" +
+            selectedCoords.lat.toFixed(7) +
+            "," +
+            selectedCoords.lng.toFixed(7);
+          fields.google_map_url.value = url;
+          updateLocationUrlDisplay(url);
+          mapModal.hide();
+        });
+
+        function updateLocationUrlDisplay(url) {
+          if (url) {
+            locationUrlDisplay.innerHTML =
+              '<i class="fa-solid fa-link"></i> ' +
+              '<a href="' +
+              url +
+              '" target="_blank" rel="noopener">' +
+              API.escapeHTML(url) +
+              "</a>";
+          } else {
+            locationUrlDisplay.innerHTML =
+              '<span class="text-muted-brand">No location selected yet.</span>';
+          }
+        }
+
+        // --------------------------------------------------
+        // Validation
+        // --------------------------------------------------
+        function validate() {
+          clearAllErrors();
+          let ok = true;
+
+          const v = {
+            title: fields.title.value.trim(),
+            price: fields.price.value.trim(),
+            area_size: fields.area_size.value.trim(),
+            area_unit: fields.area_unit.value,
+            property_type: fields.property_type.value,
+            description: fields.description.value.trim(),
+            address: fields.address.value.trim(),
+            province: fields.province.value.trim(),
+            city: fields.city.value.trim(),
+            google_map_url: fields.google_map_url.value.trim(),
+          };
+
+          if (!v.title) {
+            setError("title", "Title is required.");
+            ok = false;
+          }
+          if (!v.description) {
+            setError("description", "Description is required.");
+            ok = false;
+          }
+          if (!v.address) {
+            setError("address", "Full address is required.");
+            ok = false;
+          }
+          if (!v.province) {
+            setError("province", "Province is required.");
+            ok = false;
+          }
+          if (!v.city) {
+            setError("city", "City is required.");
+            ok = false;
+          }
+          if (!v.google_map_url) {
+            setError(
+              "google_map_url",
+              "Map location is required. Click 'Select Location' to pick one.",
+            );
+            ok = false;
+          }
+          if (!v.area_unit) {
+            setError("area_unit", "Area unit is required.");
+            ok = false;
+          }
+          if (!v.property_type) {
+            setError("property_type", "Property type is required.");
+            ok = false;
+          }
+
+          if (!v.price) {
+            setError("price", "Price is required.");
+            ok = false;
+          } else if (isNaN(Number(v.price)) || Number(v.price) <= 0) {
+            setError("price", "Price must be a positive number.");
+            ok = false;
+          }
+          if (!v.area_size) {
+            setError("area_size", "Area size is required.");
+            ok = false;
+          } else if (isNaN(Number(v.area_size)) || Number(v.area_size) <= 0) {
+            setError("area_size", "Area size must be a positive number.");
+            ok = false;
+          }
+
+          return { ok: ok, data: v };
+        }
+
+        // --------------------------------------------------
+        // Load property
+        // --------------------------------------------------
+        function showState(which) {
+          loadingState.style.display = which === "loading" ? "block" : "none";
+          errorState.style.display = which === "error" ? "block" : "none";
+          contentState.style.display = which === "content" ? "block" : "none";
+        }
+
+        function fillForm(p) {
+          propertyIdBadge.textContent = p.property_id;
+          fields.title.value = p.title || "";
+          fields.price.value = p.price || "";
+          fields.area_size.value = p.area_size || "";
+          fields.area_unit.value = p.area_unit || "";
+          fields.property_type.value = p.property_type || "";
+          fields.description.value = p.description || "";
+          fields.address.value = p.address || "";
+          fields.province.value = p.province || "";
+          fields.city.value = p.city || "";
+          fields.google_map_url.value = p.google_map_url || "";
+
+          updateLocationUrlDisplay(p.google_map_url || "");
+
+          existingImages = (p.images || []).slice();
+          renderImages();
+        }
+
+        async function loadProperty() {
+          const id = parseInt(API.getQuery("property_id") || "0", 10);
+          if (!id || id <= 0) {
+            errorTitle.textContent = "Invalid property";
+            errorMessage.textContent = "No property was specified.";
+            showState("error");
+            return;
+          }
+          propertyId = id;
+
+          showState("loading");
+
+          try {
+            const auth = await API.requireAuth("dealer");
+            if (!auth) return;
+
+            const res = await API.get("/dealer/list-my-properties.php");
+            if (!res.success) {
+              errorTitle.textContent = "Unable to load property";
+              errorMessage.textContent = res.message || "Please try again.";
+              showState("error");
+              return;
+            }
+
+            const prop = (res.properties || []).find(function (p) {
+              return parseInt(p.property_id, 10) === id;
+            });
+
+            if (!prop) {
+              errorTitle.textContent = "Property not found";
+              errorMessage.textContent =
+                "This property does not exist or does not belong to you.";
+              showState("error");
+              return;
+            }
+
+            fillForm(prop);
+            showState("content");
+          } catch (err) {
+            errorTitle.textContent = "Unable to load property";
+            errorMessage.textContent =
+              "Please check your connection and try again.";
+            showState("error");
+          }
+        }
+
+        // --------------------------------------------------
+        // Submit
+        // --------------------------------------------------
+        form.addEventListener("submit", async function (e) {
+          e.preventDefault();
+
+          const result = validate();
+          if (!result.ok) {
+            showAlert("danger", "Please fix the highlighted fields below.");
+            return;
+          }
+
+          saveBtn.disabled = true;
+          saveBtn.innerHTML =
+            '<span class="spinner-border spinner-border-sm me-2"></span> Saving...';
+
+          try {
+            // 1. Update fields
+            const payload = {
+              property_id: propertyId,
+              title: result.data.title,
+              description: result.data.description,
+              price: Number(result.data.price),
+              area_size: Number(result.data.area_size),
+              area_unit: result.data.area_unit,
+              property_type: result.data.property_type,
+              address: result.data.address,
+              province: result.data.province,
+              city: result.data.city,
+              google_map_url: result.data.google_map_url,
+            };
+
+            const updateRes = await API.post(
+              "/dealer/edit-property.php",
+              payload,
+            );
+
+            if (!updateRes.success) {
+              showAlert(
+                "danger",
+                updateRes.message || "Unable to save changes.",
+              );
+              saveBtn.disabled = false;
+              saveBtn.innerHTML =
+                '<i class="fa-regular fa-floppy-disk"></i> Save Changes';
+              return;
+            }
+
+            // 2. Upload new images (queued)
+            if (newFiles.length > 0) {
+              let successCount = 0,
+                failCount = 0;
+              let lastUploadError = "";
+              for (let i = 0; i < newFiles.length; i++) {
+                saveBtn.innerHTML =
+                  '<span class="spinner-border spinner-border-sm me-2"></span> Uploading image ' +
+                  (i + 1) +
+                  " / " +
+                  newFiles.length +
+                  "...";
+
+                const formData = new FormData();
+                formData.append("property_id", propertyId);
+                formData.append("image", newFiles[i]);
+
+                try {
+                  const upRes = await API.postForm(
+                    "/dealer/upload-property-image.php",
+                    formData,
+                  );
+                  if (upRes.success) {
+                    successCount++;
+                  } else {
+                    failCount++;
+                    lastUploadError = upRes.message || "Unknown upload error";
+                  }
+                } catch (err) {
+                  failCount++;
+                  lastUploadError =
+                    err.message || "Network error during upload";
+                }
+              }
+
+              if (failCount === 0) {
+                showAlert(
+                  "success",
+                  "Changes saved. " +
+                    successCount +
+                    " new image" +
+                    (successCount === 1 ? "" : "s") +
+                    " uploaded. Redirecting...",
+                );
+              } else {
+                // showAlert(
+                //   "warning",
+                //   "Changes saved. " +
+                //     successCount +
+                //     " uploaded, " +
+                //     failCount +
+                //     " failed. You can retry from Edit Property.",
+                // );
+                showAlert(
+                  "warning",
+                  "Property saved. " +
+                    successCount +
+                    " uploaded, " +
+                    failCount +
+                    " failed. " +
+                    (lastUploadError ? "Reason: " + lastUploadError : ""),
+                );
+              }
+            } else {
+              showAlert(
+                "success",
+                "Changes saved successfully. Redirecting...",
+              );
+            }
+
+            setTimeout(function () {
+              window.location.href = "/frontend/dealer/my-properties.html";
+            }, 1800);
+          } catch (err) {
+            showAlert(
+              "danger",
+              "Unable to save changes. Please check your connection and try again.",
+            );
+            saveBtn.disabled = false;
+            saveBtn.innerHTML =
+              '<i class="fa-regular fa-floppy-disk"></i> Save Changes';
+          }
+        });
+
+        // Init
+        loadProperty();
+      })();
+    </script>
+  </body>
+</html>

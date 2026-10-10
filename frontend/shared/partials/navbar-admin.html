@@ -1,0 +1,73 @@
+<nav class="navbar navbar-expand-lg site-navbar">
+  <div class="container-1320">
+    <a class="navbar-brand-custom" href="/frontend/admin/dashboard.html">
+      <span class="brand-logo"><i class="fa-solid fa-shield-halved"></i></span>
+      <span class="brand-text">
+        <span class="brand-name">
+          Property Dealing
+          <span class="admin-indicator">ADMIN</span>
+        </span>
+        <span class="brand-tagline">Management Panel</span>
+      </span>
+    </a>
+
+    <button
+      class="navbar-toggler"
+      type="button"
+      data-bs-toggle="collapse"
+      data-bs-target="#adminNavbar"
+      aria-controls="adminNavbar"
+      aria-expanded="false"
+      aria-label="Toggle navigation"
+    >
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="adminNavbar">
+      <ul class="navbar-nav mx-auto mb-2 mb-lg-0">
+        <li class="nav-item">
+          <a
+            class="nav-link"
+            href="/frontend/admin/dashboard.html"
+            data-nav="dashboard"
+          >
+            <i class="fa-solid fa-gauge-high me-1"></i> Dashboard
+          </a>
+        </li>
+        <li class="nav-item">
+          <a
+            class="nav-link"
+            href="/frontend/admin/dealers.html"
+            data-nav="dealers"
+          >
+            <i class="fa-solid fa-users me-1"></i> Dealers
+          </a>
+        </li>
+        <li class="nav-item">
+          <a
+            class="nav-link"
+            href="/frontend/admin/properties.html"
+            data-nav="properties"
+          >
+            <i class="fa-solid fa-building me-1"></i> Properties
+          </a>
+        </li>
+      </ul>
+
+      <div
+        class="d-flex flex-column flex-lg-row align-items-stretch align-items-lg-center gap-2"
+      >
+        <a class="nav-link" href="/frontend/admin/profile.html">
+          <i class="fa-regular fa-user me-1"></i> Profile
+        </a>
+        <button
+          class="btn btn-ghost btn-mobile-full"
+          id="adminLogoutBtn"
+          type="button"
+        >
+          <i class="fa-solid fa-right-from-bracket"></i> Logout
+        </button>
+      </div>
+    </div>
+  </div>
+</nav>

@@ -1,0 +1,387 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Dealer Login — Property Dealing</title>
+
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+      rel="stylesheet"
+    />
+    <link href="/frontend/shared/css/style.css" rel="stylesheet" />
+  </head>
+  <body>
+    <!-- Minimal auth navbar -->
+    <nav class="auth-navbar">
+      <div class="container-1320 auth-navbar__inner">
+        <a class="navbar-brand-custom" href="/frontend/public/index.html">
+          <span class="brand-logo"
+            ><i class="fa-solid fa-house-chimney"></i
+          ></span>
+          <span class="brand-text">
+            <span class="brand-name">Property Dealing</span>
+            <span class="brand-tagline"
+              >Verified Properties, Trusted Deals</span
+            >
+          </span>
+        </a>
+        <a class="back-home-link" href="/frontend/public/index.html">
+          <i class="fa-solid fa-arrow-left"></i> Back to Home
+        </a>
+      </div>
+    </nav>
+
+    <main class="auth-page">
+      <div class="auth-wrapper" id="authWrapper">
+        <!-- Content injected by JS -->
+      </div>
+    </main>
+
+    <!-- FORGOT PASSWORD MODAL -->
+    <div
+      class="modal fade"
+      id="forgotPasswordModal"
+      tabindex="-1"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-body text-center p-4">
+            <div class="auth-icon-circle" style="margin: 0 auto 16px">
+              <i class="fa-solid fa-key"></i>
+            </div>
+
+            <h5 class="mb-2">Forgot Your Password?</h5>
+
+            <p
+              class="text-muted-brand mb-4"
+              style="font-size: 14px; line-height: 1.6"
+            >
+              For security, please contact our team to reset your password.
+              We'll verify your identity and set a new one for you.
+            </p>
+
+            <div class="d-flex flex-column gap-2">
+              <a href="tel:+923466053334" class="btn btn-primary">
+                <i class="fa-solid fa-phone"></i> Call +92 346 605 3334
+              </a>
+              <a
+                href="mailto:admin@example.com"
+                class="btn btn-outline-primary"
+              >
+                <i class="fa-regular fa-envelope"></i> admin@example.com
+              </a>
+            </div>
+
+            <button
+              type="button"
+              class="btn btn-ghost w-100 mt-3"
+              data-bs-dismiss="modal"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/frontend/shared/js/api.js"></script>
+    <script src="/frontend/shared/js/partials.js"></script>
+
+    <script>
+      (function () {
+        "use strict";
+
+        const wrapper = document.getElementById("authWrapper");
+        const loginEndpoint = "/auth/login-dealer.php";
+
+        // --------------------------------------------------
+        // Login form
+        // --------------------------------------------------
+        function renderLoginForm() {
+          wrapper.innerHTML =
+            '<div class="auth-card">' +
+            '<div class="auth-icon-circle"><i class="fa-regular fa-user"></i></div>' +
+            '<h1 class="auth-title">Dealer Login</h1>' +
+            '<p class="auth-subtitle">Sign in to manage your property listings.</p>' +
+            '<div id="topAlert"></div>' +
+            '<form id="loginForm" novalidate>' +
+            '<div class="mb-3">' +
+            '<label for="username" class="form-label">Username <span class="req">*</span></label>' +
+            '<input type="text" class="form-control" id="username" name="username"' +
+            ' placeholder="Enter username" autocomplete="username">' +
+            '<div class="form-text">3-50 characters, letters, numbers, underscore.</div>' +
+            '<div class="invalid-feedback"></div>' +
+            "</div>" +
+            '<div class="mb-2">' +
+            '<label for="password" class="form-label">Password <span class="req">*</span></label>' +
+            '<div class="password-field">' +
+            '<input type="password" class="form-control" id="password" name="password"' +
+            ' placeholder="Enter password" autocomplete="current-password">' +
+            '<button type="button" class="password-toggle" data-target="password" aria-label="Show password">' +
+            '<i class="fa-regular fa-eye"></i>' +
+            "</button>" +
+            "</div>" +
+            '<div class="form-text">Minimum 8 characters.</div>' +
+            '<div class="invalid-feedback"></div>' +
+            "</div>" +
+            '<div class="text-end mb-3">' +
+            '<a href="#" id="forgotPasswordBtn" class="fw-semibold text-decoration-none" ' +
+            'style="font-size:13px;color:var(--brand-primary);">Forgot Password?</a>' +
+            "</div>" +
+            '<div id="bottomAlert"></div>' +
+            '<button type="submit" class="btn btn-primary btn-lg w-100" id="loginBtn">Login</button>' +
+            '<p class="auth-footer-link text-center">' +
+            'New dealer? <a href="/frontend/public/dealer-register.html">Register here</a>' +
+            "</p>" +
+            "</form>" +
+            "</div>";
+
+          attachFormHandlers();
+          attachPasswordToggle();
+          attachForgotPassword();
+        }
+
+        // --------------------------------------------------
+        // State cards
+        // --------------------------------------------------
+        function renderStateCard(state, message, contactNumber) {
+          const isPending = state === "pending";
+          const title = isPending
+            ? "Account Pending Approval"
+            : "Registration Rejected";
+          const icon = isPending ? "fa-clock" : "fa-circle-xmark";
+          const cardClass = isPending
+            ? "auth-state-card--pending"
+            : "auth-state-card--rejected";
+          const iconClass = isPending
+            ? "auth-state-icon--pending"
+            : "auth-state-icon--rejected";
+
+          const text =
+            message ||
+            (isPending
+              ? "Your registration is waiting for admin approval."
+              : "Your dealer registration was not approved by the admin.");
+
+          const contact = contactNumber || "+923466053334";
+          const telHref = "tel:" + contact.replace(/[^\d+]/g, "");
+
+          wrapper.innerHTML =
+            '<div class="auth-state-card ' +
+            cardClass +
+            '">' +
+            '<div class="auth-state-icon ' +
+            iconClass +
+            '">' +
+            '<i class="fa-solid ' +
+            icon +
+            '"></i>' +
+            "</div>" +
+            '<h2 class="auth-state-title">' +
+            title +
+            "</h2>" +
+            '<p class="auth-state-text">' +
+            API.escapeHTML(text) +
+            "</p>" +
+            '<p class="auth-state-contact">' +
+            (isPending
+              ? "Contact us to request approval:"
+              : "Contact us for more information:") +
+            "<br>" +
+            API.escapeHTML(contact) +
+            "</p>" +
+            '<a class="btn btn-primary" href="' +
+            telHref +
+            '">' +
+            '<i class="fa-solid fa-phone"></i> Call Now' +
+            "</a>" +
+            "</div>";
+        }
+
+        // --------------------------------------------------
+        // Password toggle
+        // --------------------------------------------------
+        function attachPasswordToggle() {
+          document.querySelectorAll(".password-toggle").forEach(function (btn) {
+            btn.addEventListener("click", function () {
+              const id = btn.getAttribute("data-target");
+              const input = document.getElementById(id);
+              if (!input) return;
+              const isPassword = input.type === "password";
+              input.type = isPassword ? "text" : "password";
+              const icon = btn.querySelector("i");
+              if (icon)
+                icon.className = isPassword
+                  ? "fa-regular fa-eye-slash"
+                  : "fa-regular fa-eye";
+              btn.setAttribute(
+                "aria-label",
+                isPassword ? "Hide password" : "Show password",
+              );
+            });
+          });
+        }
+
+        // --------------------------------------------------
+        // Forgot password
+        // --------------------------------------------------
+        function attachForgotPassword() {
+          const btn = document.getElementById("forgotPasswordBtn");
+          if (!btn) return;
+          btn.addEventListener("click", function (e) {
+            e.preventDefault();
+            const modalEl = document.getElementById("forgotPasswordModal");
+            if (modalEl) {
+              new bootstrap.Modal(modalEl).show();
+            }
+          });
+        }
+
+        // --------------------------------------------------
+        // Form handlers
+        // --------------------------------------------------
+        function attachFormHandlers() {
+          const form = document.getElementById("loginForm");
+          const usernameEl = document.getElementById("username");
+          const passwordEl = document.getElementById("password");
+          const loginBtn = document.getElementById("loginBtn");
+          const topAlertEl = document.getElementById("topAlert");
+          const bottomAlertEl = document.getElementById("bottomAlert");
+
+          function setError(el, message) {
+            el.classList.add("is-invalid");
+            const fb = el.parentElement.querySelector(".invalid-feedback");
+            if (fb) fb.textContent = message;
+          }
+          function clearError(el) {
+            el.classList.remove("is-invalid");
+            const fb = el.parentElement.querySelector(".invalid-feedback");
+            if (fb) fb.textContent = "";
+          }
+          function clearAllErrors() {
+            clearError(usernameEl);
+            clearError(passwordEl);
+            topAlertEl.innerHTML = "";
+            bottomAlertEl.innerHTML = "";
+          }
+
+          function showTopAlert(type, html) {
+            topAlertEl.innerHTML =
+              '<div class="auth-inline-alert auth-inline-alert--' +
+              type +
+              '">' +
+              '<i class="fa-solid fa-circle-exclamation"></i>' +
+              "<div>" +
+              html +
+              "</div>" +
+              "</div>";
+          }
+          function showBottomAlert(type, html) {
+            bottomAlertEl.innerHTML =
+              '<div class="auth-inline-alert auth-inline-alert--' +
+              type +
+              '">' +
+              '<i class="fa-solid fa-circle-exclamation"></i>' +
+              "<div>" +
+              html +
+              "</div>" +
+              "</div>";
+          }
+
+          usernameEl.addEventListener("input", clearAllErrors);
+          passwordEl.addEventListener("input", clearAllErrors);
+
+          form.addEventListener("submit", async function (e) {
+            e.preventDefault();
+            clearAllErrors();
+
+            const username = usernameEl.value.trim();
+            const password = passwordEl.value;
+
+            let ok = true;
+            if (!username) {
+              setError(usernameEl, "Username is required.");
+              ok = false;
+            }
+            if (!password) {
+              setError(passwordEl, "Password is required.");
+              ok = false;
+            }
+            if (!ok) return;
+
+            loginBtn.disabled = true;
+            loginBtn.innerHTML =
+              '<span class="spinner-border spinner-border-sm me-2"></span> Signing in...';
+
+            try {
+              const res = await API.post(loginEndpoint, { username, password });
+
+              if (res.success && res.status === "approved") {
+                window.location.href = "/frontend/dealer/dashboard.html";
+                return;
+              }
+
+              if (res.status === "pending") {
+                renderStateCard("pending", res.message, res.contact_number);
+                return;
+              }
+
+              if (res.status === "rejected") {
+                renderStateCard("rejected", res.message, res.contact_number);
+                return;
+              }
+
+              if (res.status === "not_registered") {
+                showTopAlert(
+                  "warning",
+                  "<strong>No account found.</strong> " +
+                    "You haven't registered yet. " +
+                    '<a href="/frontend/public/dealer-register.html">Register here</a>',
+                );
+                loginBtn.disabled = false;
+                loginBtn.innerHTML = "Login";
+                return;
+              }
+
+              if (
+                res.status === "invalid_credentials" ||
+                res.httpStatus === 401
+              ) {
+                showBottomAlert("danger", "Invalid username or password.");
+                loginBtn.disabled = false;
+                loginBtn.innerHTML = "Login";
+                return;
+              }
+
+              showBottomAlert(
+                "danger",
+                API.escapeHTML(
+                  res.message || "Login failed. Please try again.",
+                ),
+              );
+              loginBtn.disabled = false;
+              loginBtn.innerHTML = "Login";
+            } catch (err) {
+              showBottomAlert(
+                "danger",
+                "Unable to connect. Please check your connection and try again.",
+              );
+              loginBtn.disabled = false;
+              loginBtn.innerHTML = "Login";
+            }
+          });
+        }
+
+        // Init
+        renderLoginForm();
+      })();
+    </script>
+  </body>
+</html>

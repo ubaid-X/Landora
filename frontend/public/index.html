@@ -1,0 +1,514 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Property Dealing — Find Verified Properties in Pakistan</title>
+    <meta
+      name="description"
+      content="Verified properties from trusted dealers in Swat, Khyber Pakhtunkhwa and across Pakistan."
+    />
+
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/glightbox/dist/css/glightbox.min.css"
+      rel="stylesheet"
+    />
+    <link href="/frontend/shared/css/style.css" rel="stylesheet" />
+  </head>
+  <body>
+    <div id="navbar" data-navbar="public"></div>
+
+    <main>
+      <!-- HERO -->
+      <section class="hero-section">
+        <div class="container-1320">
+          <h1 class="hero-display">
+            Find Your Perfect Property<br />in Swat &amp; KP
+          </h1>
+          <p class="hero-subline">
+            Verified properties, trusted dealers, and a safer way to buy or
+            invest.
+          </p>
+
+          <form id="searchForm" class="hero-search" autocomplete="off">
+            <div class="row g-2">
+              <div class="col-12 col-lg-5">
+                <label for="qInput" class="visually-hidden"
+                  >Search by city or province</label
+                >
+                <input
+                  type="text"
+                  class="form-control"
+                  id="qInput"
+                  name="q"
+                  list="locationsList"
+                  placeholder="Search by city or province..."
+                />
+                <datalist id="locationsList"></datalist>
+              </div>
+
+              <div class="col-12 col-sm-6 col-lg-2">
+                <label for="typeSelect" class="visually-hidden"
+                  >Property type</label
+                >
+                <select class="form-select" id="typeSelect" name="type">
+                  <option value="all">All Types</option>
+                  <option value="House">House</option>
+                  <option value="Plot">Plot</option>
+                  <option value="Shop">Shop</option>
+                  <option value="Office">Office</option>
+                  <option value="Building">Building</option>
+                  <option value="Agricultural">Agricultural</option>
+                </select>
+              </div>
+
+              <div class="col-12 col-sm-6 col-lg-2">
+                <label for="statusSelect" class="visually-hidden">Status</label>
+                <select class="form-select" id="statusSelect" name="status">
+                  <option value="all">All Status</option>
+                  <option value="unsold">Unsold</option>
+                  <option value="sold">Sold</option>
+                </select>
+              </div>
+
+              <div class="col-12 col-lg-3">
+                <button
+                  type="submit"
+                  class="btn btn-primary w-100"
+                  style="height: 48px"
+                >
+                  <i class="fa-solid fa-magnifying-glass"></i> Search
+                </button>
+              </div>
+            </div>
+
+            <p class="search-hint mb-0">Try: kpk, swat, lahore</p>
+          </form>
+        </div>
+      </section>
+
+      <!-- LATEST PROPERTIES -->
+      <section class="container-1320 section" id="properties">
+        <div
+          class="d-flex flex-wrap justify-content-between align-items-end mb-4 gap-2"
+        >
+          <div>
+            <h2 class="section-title mb-1">Latest Properties</h2>
+            <p class="text-muted-brand mb-0">
+              Newest verified listings from our approved dealers.
+            </p>
+          </div>
+          <div id="resultsInfo" class="text-muted-brand text-small"></div>
+        </div>
+
+        <!-- Loading state -->
+        <div id="loadingState" class="row g-4">
+          <div class="col-12 col-md-6 col-lg-4 col-xxl-3">
+            <div class="skeleton-card">
+              <div class="skeleton-card__image"></div>
+              <div class="skeleton-card__body">
+                <div class="skeleton" style="height: 20px; width: 70%"></div>
+                <div class="skeleton" style="height: 14px; width: 100%"></div>
+                <div class="skeleton" style="height: 14px; width: 60%"></div>
+                <div class="skeleton" style="height: 24px; width: 40%"></div>
+              </div>
+            </div>
+          </div>
+          <div class="col-12 col-md-6 col-lg-4 col-xxl-3">
+            <div class="skeleton-card">
+              <div class="skeleton-card__image"></div>
+              <div class="skeleton-card__body">
+                <div class="skeleton" style="height: 20px; width: 70%"></div>
+                <div class="skeleton" style="height: 14px; width: 100%"></div>
+                <div class="skeleton" style="height: 14px; width: 60%"></div>
+                <div class="skeleton" style="height: 24px; width: 40%"></div>
+              </div>
+            </div>
+          </div>
+          <div class="col-12 col-md-6 col-lg-4 col-xxl-3">
+            <div class="skeleton-card">
+              <div class="skeleton-card__image"></div>
+              <div class="skeleton-card__body">
+                <div class="skeleton" style="height: 20px; width: 70%"></div>
+                <div class="skeleton" style="height: 14px; width: 100%"></div>
+                <div class="skeleton" style="height: 14px; width: 60%"></div>
+                <div class="skeleton" style="height: 24px; width: 40%"></div>
+              </div>
+            </div>
+          </div>
+          <div class="col-12 col-md-6 col-lg-4 col-xxl-3">
+            <div class="skeleton-card">
+              <div class="skeleton-card__image"></div>
+              <div class="skeleton-card__body">
+                <div class="skeleton" style="height: 20px; width: 70%"></div>
+                <div class="skeleton" style="height: 14px; width: 100%"></div>
+                <div class="skeleton" style="height: 14px; width: 60%"></div>
+                <div class="skeleton" style="height: 24px; width: 40%"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Results grid -->
+        <div id="propertiesGrid" class="row g-4" style="display: none"></div>
+
+        <!-- Empty state -->
+        <div id="emptyState" class="empty-state" style="display: none">
+          <i class="fa-regular fa-folder-open"></i>
+          <h5 id="emptyTitle">No properties available yet</h5>
+          <p id="emptyMessage">
+            Verified listings will appear here as dealers join the platform.
+          </p>
+          <button
+            id="clearFiltersBtn"
+            class="btn btn-outline-primary"
+            style="display: none"
+          >
+            Clear Filters
+          </button>
+        </div>
+
+        <!-- Error state -->
+        <div id="errorState" style="display: none">
+          <div class="alert alert-danger">
+            <i class="fa-solid fa-circle-exclamation"></i>
+            <span id="errorMessage"
+              >Something went wrong. Please try again.</span
+            >
+          </div>
+        </div>
+      </section>
+
+      <!-- TRUST STRIP -->
+      <section class="container-1320 section-tight">
+        <div class="trust-strip">
+          <div class="row g-4">
+            <div class="col-12 col-md-6 col-lg-3">
+              <div class="trust-item">
+                <i class="fa-solid fa-circle-check trust-item__icon"></i>
+                <div>
+                  <h6 class="trust-item__title">Verified Dealers</h6>
+                  <p class="trust-item__desc">
+                    All dealers are verified and trusted
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div class="col-12 col-md-6 col-lg-3">
+              <div class="trust-item">
+                <i class="fa-solid fa-shield-halved trust-item__icon"></i>
+                <div>
+                  <h6 class="trust-item__title">Secure Platform</h6>
+                  <p class="trust-item__desc">Your safety is our priority</p>
+                </div>
+              </div>
+            </div>
+            <div class="col-12 col-md-6 col-lg-3">
+              <div class="trust-item">
+                <i class="fa-solid fa-comments trust-item__icon"></i>
+                <div>
+                  <h6 class="trust-item__title">Direct Contact</h6>
+                  <p class="trust-item__desc">
+                    You deal with our team personally
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div class="col-12 col-md-6 col-lg-3">
+              <div class="trust-item">
+                <i class="fa-solid fa-location-dot trust-item__icon"></i>
+                <div>
+                  <h6 class="trust-item__title">Local Focus</h6>
+                  <p class="trust-item__desc">Swat &amp; KP properties</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <div id="footer"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/glightbox/dist/js/glightbox.min.js"></script>
+    <script src="/frontend/shared/js/api.js"></script>
+    <script src="/frontend/shared/js/partials.js"></script>
+
+    <script>
+      (function () {
+        "use strict";
+
+        const searchForm = document.getElementById("searchForm");
+        const qInput = document.getElementById("qInput");
+        const typeSelect = document.getElementById("typeSelect");
+        const statusSelect = document.getElementById("statusSelect");
+        const locationsList = document.getElementById("locationsList");
+
+        const loadingState = document.getElementById("loadingState");
+        const propertiesGrid = document.getElementById("propertiesGrid");
+        const emptyState = document.getElementById("emptyState");
+        const emptyTitle = document.getElementById("emptyTitle");
+        const emptyMessage = document.getElementById("emptyMessage");
+        const clearFiltersBtn = document.getElementById("clearFiltersBtn");
+        const errorState = document.getElementById("errorState");
+        const errorMessage = document.getElementById("errorMessage");
+        const resultsInfo = document.getElementById("resultsInfo");
+
+        let lightbox = null;
+
+        function statusBadgeHtml(status) {
+          const cls = status === "sold" ? "badge-sold" : "badge-unsold";
+          const label = status === "sold" ? "Sold" : "Unsold";
+          return (
+            '<span class="badge-pill-custom ' + cls + '">' + label + "</span>"
+          );
+        }
+
+        function buildCard(p) {
+          const primaryImage =
+            p.images && p.images.length > 0 ? p.images[0] : null;
+          const extraCount =
+            p.images && p.images.length > 1 ? p.images.length - 1 : 0;
+          const detailUrl =
+            "/frontend/public/property-details.html?property_id=" +
+            p.property_id;
+
+          const imgHtml = primaryImage
+            ? '<img class="property-card__image" src="' +
+              API.imageUrl(primaryImage.image_path) +
+              '" alt="' +
+              API.escapeHTML(p.title) +
+              '" loading="lazy">'
+            : '<div class="img-fallback"><i class="fa-regular fa-image"></i><span>No image available</span></div>';
+
+          const countBadge =
+            extraCount > 0
+              ? '<span class="property-card__image-count"><i class="fa-regular fa-images"></i> +' +
+                extraCount +
+                "</span>"
+              : "";
+
+          const desc = p.description ? API.escapeHTML(p.description) : "";
+          const locationText =
+            API.escapeHTML(p.city) + ", " + API.escapeHTML(p.province);
+          const allImages = p.images
+            ? p.images
+                .map(function (i) {
+                  return API.imageUrl(i.image_path);
+                })
+                .join(",")
+            : "";
+
+          return (
+            '<div class="col-12 col-md-6 col-lg-4 col-xxl-3">' +
+            '<article class="property-card">' +
+            '<div class="property-card__image-wrap" data-images="' +
+            allImages +
+            '">' +
+            imgHtml +
+            countBadge +
+            '<span class="property-card__status">' +
+            statusBadgeHtml(p.property_status) +
+            "</span>" +
+            "</div>" +
+            '<div class="property-card__body">' +
+            '<h3 class="property-card__title">' +
+            API.escapeHTML(p.title) +
+            "</h3>" +
+            '<p class="property-card__desc">' +
+            desc +
+            "</p>" +
+            '<p class="property-card__price">' +
+            API.formatPrice(p.price) +
+            "</p>" +
+            '<div class="property-card__meta">' +
+            '<span class="meta-item"><i class="fa-solid fa-ruler-combined"></i> ' +
+            API.escapeHTML(p.area_size) +
+            " " +
+            API.escapeHTML(p.area_unit) +
+            "</span>" +
+            '<span class="meta-sep">|</span>' +
+            '<span class="meta-item"><i class="fa-solid fa-house"></i> ' +
+            API.escapeHTML(p.property_type) +
+            "</span>" +
+            "</div>" +
+            '<div class="property-card__meta">' +
+            '<span class="meta-item"><i class="fa-solid fa-location-dot"></i> ' +
+            locationText +
+            "</span>" +
+            "</div>" +
+            '<div class="property-card__footer">' +
+            '<a href="' +
+            detailUrl +
+            '" class="btn btn-primary w-100">' +
+            'See More <i class="fa-solid fa-arrow-right"></i>' +
+            "</a>" +
+            "</div>" +
+            "</div>" +
+            "</article>" +
+            "</div>"
+          );
+        }
+
+        function attachLightbox() {
+          document
+            .querySelectorAll(".property-card__image-wrap")
+            .forEach(function (wrap) {
+              const urls = (wrap.getAttribute("data-images") || "")
+                .split(",")
+                .filter(Boolean);
+              if (urls.length === 0) return;
+              wrap.addEventListener("click", function (e) {
+                e.preventDefault();
+                const items = urls.map(function (u) {
+                  return { href: u, type: "image" };
+                });
+                if (lightbox) lightbox.destroy();
+                lightbox = GLightbox({
+                  elements: items,
+                  touchNavigation: true,
+                  loop: true,
+                  zoomable: false,
+                });
+                lightbox.open();
+              });
+            });
+        }
+
+        async function loadLocations() {
+          try {
+            const res = await API.get("/public/list-locations.php");
+            if (!res.success) return;
+            const unique = Array.from(
+              new Set((res.provinces || []).concat(res.cities || [])),
+            );
+            locationsList.innerHTML = unique
+              .map(function (v) {
+                return '<option value="' + API.escapeHTML(v) + '"></option>';
+              })
+              .join("");
+          } catch (_) {}
+        }
+
+        function readParams() {
+          return {
+            q: (API.getQuery("q") || "").trim(),
+            type: (API.getQuery("type") || "all").trim(),
+            status: (API.getQuery("status") || "all").trim(),
+          };
+        }
+
+        function applyParamsToForm(p) {
+          qInput.value = p.q;
+          typeSelect.value = [
+            "all",
+            "House",
+            "Plot",
+            "Shop",
+            "Office",
+            "Building",
+            "Agricultural",
+          ].includes(p.type)
+            ? p.type
+            : "all";
+          statusSelect.value = ["all", "unsold", "sold"].includes(p.status)
+            ? p.status
+            : "all";
+        }
+
+        function showState(which) {
+          loadingState.style.display = which === "loading" ? "flex" : "none";
+          propertiesGrid.style.display = which === "results" ? "flex" : "none";
+          emptyState.style.display = which === "empty" ? "block" : "none";
+          errorState.style.display = which === "error" ? "block" : "none";
+        }
+
+        async function loadProperties(params) {
+          showState("loading");
+
+          const qs = new URLSearchParams();
+          if (params.q) qs.set("q", params.q);
+          if (params.type !== "all") qs.set("type", params.type);
+          if (params.status !== "all") qs.set("status", params.status);
+
+          const url =
+            "/public/list-properties.php" +
+            (qs.toString() ? "?" + qs.toString() : "");
+
+          try {
+            const res = await API.get(url);
+            if (!res.success) {
+              errorMessage.textContent =
+                res.message || "Unable to load properties.";
+              showState("error");
+              return;
+            }
+            const list = res.properties || [];
+
+            if (list.length === 0) {
+              const hasFilter =
+                params.q || params.type !== "all" || params.status !== "all";
+              if (hasFilter) {
+                emptyTitle.textContent = "No properties found for your search";
+                emptyMessage.textContent =
+                  "Try a different city or province, or clear the filters.";
+                clearFiltersBtn.style.display = "inline-flex";
+              } else {
+                emptyTitle.textContent = "No properties available yet";
+                emptyMessage.textContent =
+                  "Verified listings will appear here as dealers join the platform.";
+                clearFiltersBtn.style.display = "none";
+              }
+              resultsInfo.textContent = "";
+              showState("empty");
+              return;
+            }
+
+            propertiesGrid.innerHTML = list.map(buildCard).join("");
+            resultsInfo.textContent =
+              list.length +
+              " " +
+              (list.length === 1 ? "property" : "properties") +
+              " found";
+            showState("results");
+            attachLightbox();
+          } catch (err) {
+            errorMessage.textContent =
+              "Unable to load properties. Please try again.";
+            showState("error");
+          }
+        }
+
+        searchForm.addEventListener("submit", function (e) {
+          e.preventDefault();
+          const qs = new URLSearchParams();
+          if (qInput.value.trim()) qs.set("q", qInput.value.trim());
+          if (typeSelect.value !== "all") qs.set("type", typeSelect.value);
+          if (statusSelect.value !== "all")
+            qs.set("status", statusSelect.value);
+          window.location.href =
+            window.location.pathname +
+            (qs.toString() ? "?" + qs.toString() : "");
+        });
+
+        clearFiltersBtn.addEventListener("click", function () {
+          window.location.href = window.location.pathname;
+        });
+
+        const params = readParams();
+        applyParamsToForm(params);
+        loadProperties(params);
+        loadLocations();
+      })();
+    </script>
+  </body>
+</html>
