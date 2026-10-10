@@ -1,6 +1,7 @@
 <?php
 
-// Include at the top of every admin-only endpoint.
+
+require_once __DIR__ . '/../config/session.php';
 
 if (session_status() === PHP_SESSION_NONE) {
     session_start();

@@ -1,0 +1,11 @@
+# Block all direct browser access to PHP class files.
+# Classes must only be loaded via `require` from API endpoints.
+
+<IfModule mod_authz_core.c>
+    Require all denied
+</IfModule>
+
+<IfModule !mod_authz_core.c>
+    Order Deny,Allow
+    Deny from all
+</IfModule>

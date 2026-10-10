@@ -2,6 +2,7 @@
 
 header('Content-Type: application/json');
 
+require_once __DIR__ . '/../../config/session.php';
 require_once __DIR__ . '/../../classes/Database.php';
 require_once __DIR__ . '/../../classes/Admin.php';
 
@@ -71,6 +72,9 @@ try {
     // Case 1: Not found
     if ($adminRow === null) {
 
+        // Same delay as wrong password — prevents user enumeration via timing
+        sleep(1);
+        
         http_response_code(404);
 
         echo json_encode([
@@ -82,9 +86,11 @@ try {
         exit;
     }
 
-
-    // Case 2: Wrong password
+        // Case 2: Wrong password
     if (!$admin->verifyPassword($password, $adminRow['password'])) {
+
+        // Slow down brute-force attempts
+        sleep(1);
 
         http_response_code(401);
 
@@ -96,7 +102,6 @@ try {
 
         exit;
     }
-
 
     // Case 3: Approved admin → create session
     session_start();

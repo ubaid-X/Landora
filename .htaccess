@@ -1,0 +1,38 @@
+# ============================================================
+# Security headers
+# ============================================================
+
+<IfModule mod_headers.c>
+
+    # Prevent browsers from guessing MIME types
+    Header set X-Content-Type-Options "nosniff"
+
+    # Block framing by other sites (clickjacking protection)
+    # SAMEORIGIN allows our own pages to embed content if needed
+    Header set X-Frame-Options "SAMEORIGIN"
+
+    # Don't leak full referrer to third parties
+    Header set Referrer-Policy "strict-origin-when-cross-origin"
+
+    # Restrict browser features we don't use
+    Header set Permissions-Policy "geolocation=(), microphone=(), camera=()"
+
+</IfModule>
+
+# ============================================================
+# Block access to sensitive dotfiles
+# ============================================================
+
+<FilesMatch "^\.">
+    Require all denied
+</FilesMatch>
+
+# Block access to markdown documentation (harmless but noisy)
+<FilesMatch "\.(md|markdown)$">
+    Require all denied
+</FilesMatch>
+
+# Block access to backup / temp files
+<FilesMatch "\.(sql|bak|log|ini|yml|yaml)$">
+    Require all denied
+</FilesMatch>

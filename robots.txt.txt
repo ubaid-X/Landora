@@ -1,0 +1,7 @@
+User-agent: *
+Disallow: /frontend/admin/
+Disallow: /frontend/dealer/
+Disallow: /backend/
+Disallow: /uploads/
+
+Allow: /frontend/public/
