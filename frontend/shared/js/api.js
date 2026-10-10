@@ -172,7 +172,7 @@
     function imageUrl(path) {
         if (!path) return '';
 
-        // If it's already a full URL (from ImgBB), return it as-is
+        // If it's already a full URL (ImgBB), return it as-is
         if (path.startsWith('http://') || path.startsWith('https://')) {
             return path;
         }
@@ -181,7 +181,6 @@
         if (path.startsWith('/')) return path;
         return '/' + path;
     }
-
     /**
      * Render an image fallback inside a container.
      * @param {HTMLElement} container

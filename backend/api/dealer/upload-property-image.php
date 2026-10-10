@@ -5,7 +5,6 @@ header('Content-Type: application/json');
 require_once __DIR__ . '/../../middleware/require-dealer.php';
 require_once __DIR__ . '/../../classes/Database.php';
 require_once __DIR__ . '/../../classes/Property.php';
-require_once __DIR__ . '/../../config/config.php'; // Loads ImgBB key
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     http_response_code(405);
@@ -53,14 +52,16 @@ if (!isset($allowedMimes[$mime])) {
     exit;
 }
 
+$ext = $allowedMimes[$mime];
+
 try {
     $database = new Database();
     $pdo = $database->getConnection();
 
     $property = new Property($pdo);
 
-    // Check property belongs to dealer
     $existing = $property->findById($propertyId);
+
     if ($existing === null || (int) $existing['dealer_id'] !== $dealerId) {
         http_response_code(404);
         echo json_encode(['success' => false, 'message' => 'Property not found or does not belong to you.']);
@@ -81,45 +82,43 @@ try {
         exit;
     }
 
-    // Encode image to base64 for ImgBB
-    $imageData = base64_encode(file_get_contents($file['tmp_name']));
+    // Upload base dir: <project>/uploads/property_images
+    $baseDir = realpath(__DIR__ . '/../../../uploads/property_images');
 
-    // Prepare cURL request to ImgBB
-    $ch = curl_init();
-    curl_setopt($ch, CURLOPT_URL, 'https://api.imgbb.com/1/upload?key=' . IMGBB_API_KEY);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-    curl_setopt($ch, CURLOPT_POST, 1);
-    curl_setopt($ch, CURLOPT_POSTFIELDS, [
-        'image' => $imageData,
-        'name'  => uniqid() . '_property',
-    ]);
-
-    $response = curl_exec($ch);
-    $curlError = curl_error($ch);
-            $response  = curl_exec($ch);
-    $curlError = curl_error($ch);
-
-    if ($curlError) {
-        throw new Exception('Image upload service unavailable: ' . $curlError);
+    if ($baseDir === false) {
+        http_response_code(500);
+        echo json_encode(['success' => false, 'message' => 'Upload directory is not available.']);
+        exit;
     }
 
-    $responseData = json_decode($response, true);
+    $propertyDir = $baseDir . DIRECTORY_SEPARATOR . $propertyId;
 
-    if (!isset($responseData['data']['url'])) {
-        throw new Exception('Image upload failed. Invalid response from ImgBB.');
+    if (!is_dir($propertyDir)) {
+        if (!mkdir($propertyDir, 0775, true)) {
+            http_response_code(500);
+            echo json_encode(['success' => false, 'message' => 'Unable to create upload directory.']);
+            exit;
+        }
     }
 
-    // ImgBB returns a direct URL to the image
-    $imageUrl = $responseData['data']['url'];
+    $filename   = bin2hex(random_bytes(8)) . '.' . $ext;
+    $targetPath = $propertyDir . DIRECTORY_SEPARATOR . $filename;
 
-    // Store the full URL in the database
+    if (!move_uploaded_file($file['tmp_name'], $targetPath)) {
+        http_response_code(500);
+        echo json_encode(['success' => false, 'message' => 'Unable to save uploaded image.']);
+        exit;
+    }
+
+    $relativePath = 'uploads/property_images/' . $propertyId . '/' . $filename;
+
     $stmt = $pdo->prepare("
         INSERT INTO property_images (property_id, image_path)
         VALUES (:property_id, :image_path)
     ");
     $stmt->execute([
         ':property_id' => $propertyId,
-        ':image_path'  => $imageUrl,
+        ':image_path'  => $relativePath,
     ]);
 
     http_response_code(201);
@@ -128,13 +127,10 @@ try {
         'message'    => 'Image uploaded successfully.',
         'image_id'   => (int) $pdo->lastInsertId(),
         'property_id'=> $propertyId,
-        'image_url'  => $imageUrl
+        'image_path' => $relativePath
     ]);
 
 } catch (Exception $e) {
     http_response_code(500);
-    echo json_encode([
-        'success' => false,
-        'message' => 'Unable to upload image: ' . $e->getMessage()
-    ]);
+    echo json_encode(['success' => false, 'message' => 'Unable to upload image.']);
 }
