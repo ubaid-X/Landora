@@ -4407,3 +4407,49 @@ textarea.form-control {
     align-items: center;
     gap: 10px;
 }
+
+
+
+/* ---------------------------------------------------------
+   40. FOOTER — wrapping + small-screen layout
+   --------------------------------------------------------- */
+
+/* Allow any long string (email, URL) to wrap mid-word if needed */
+.site-footer a {
+    overflow-wrap: anywhere;
+    word-break: break-word;
+    hyphens: auto;
+}
+
+/* Contact line: icon + text, aligned to first line, wrappable */
+.site-footer .footer-contact-line {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    margin-bottom: 8px;
+    flex-wrap: wrap;
+}
+
+.site-footer .footer-contact-line i {
+    margin-top: 3px;
+    flex-shrink: 0;
+}
+
+.site-footer .footer-contact-line a {
+    flex: 1 1 auto;
+    min-width: 0;
+    /* lets flex child shrink below content width */
+}
+
+/* Stack all footer columns below 576px (already true on Bootstrap's col-6 → 
+   but explicit to guarantee it at 320px too) */
+@media (max-width: 575.98px) {
+    .site-footer .row>[class*="col-"] {
+        flex: 0 0 100%;
+        max-width: 100%;
+    }
+
+    .site-footer {
+        padding-top: var(--space-xl);
+    }
+}
