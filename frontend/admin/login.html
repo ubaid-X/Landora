@@ -1,199 +1,257 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Admin Login — Property Dealing</title>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Admin Login — Property Dealing</title>
 
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet">
-  <link href="/frontend/shared/css/style.css" rel="stylesheet">
-</head>
-<body>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+      rel="stylesheet"
+    />
+    <link href="/frontend/shared/css/style.css" rel="stylesheet" />
+    <link
+      rel="icon"
+      type="image/png"
+      href="../shared/img/android-chrome-512x512.png"
+    />
+  </head>
+  <body>
+    <main class="admin-login-page">
+      <div class="admin-login-card">
+        <div class="admin-login-shield">
+          <i class="fa-solid fa-shield-halved"></i>
+        </div>
 
-  <main class="admin-login-page">
-    <div class="admin-login-card">
+        <h1 class="admin-login-title">Admin Login</h1>
+        <p class="admin-login-subtitle">
+          Restricted access — platform administrators only.
+        </p>
 
-      <div class="admin-login-shield">
-        <i class="fa-solid fa-shield-halved"></i>
+        <div
+          id="formAlert"
+          class="alert"
+          style="display: none"
+          role="alert"
+        ></div>
+
+        <form id="adminLoginForm" novalidate>
+          <!-- Username -->
+          <div class="mb-3">
+            <label for="username" class="form-label"
+              >Username <span class="req">*</span></label
+            >
+            <div class="input-with-icon" id="usernameWrap">
+              <i class="fa-regular fa-user input-icon"></i>
+              <input
+                type="text"
+                class="form-control"
+                id="username"
+                name="username"
+                placeholder="Enter admin username"
+                autocomplete="username"
+              />
+            </div>
+            <div class="invalid-feedback" id="usernameFeedback"></div>
+          </div>
+
+          <!-- Password -->
+          <div class="mb-4">
+            <label for="password" class="form-label"
+              >Password <span class="req">*</span></label
+            >
+            <div class="input-with-icon" id="passwordWrap">
+              <i class="fa-solid fa-lock input-icon"></i>
+              <input
+                type="password"
+                class="form-control has-toggle"
+                id="password"
+                name="password"
+                placeholder="Enter password"
+                autocomplete="current-password"
+              />
+              <button
+                type="button"
+                class="password-toggle-btn"
+                id="passwordToggle"
+                aria-label="Show password"
+              >
+                <i class="fa-regular fa-eye" id="passwordToggleIcon"></i>
+              </button>
+            </div>
+            <div class="invalid-feedback" id="passwordFeedback"></div>
+          </div>
+
+          <button
+            type="submit"
+            class="btn btn-primary btn-lg w-100"
+            id="loginBtn"
+          >
+            Login
+          </button>
+        </form>
+
+        <p class="admin-login-footer">
+          Not an administrator?
+          <a href="/frontend/public/index.html">Back to Home</a>
+        </p>
       </div>
+    </main>
 
-      <h1 class="admin-login-title">Admin Login</h1>
-      <p class="admin-login-subtitle">
-        Restricted access — platform administrators only.
-      </p>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/frontend/shared/js/api.js"></script>
 
-      <div id="formAlert" class="alert" style="display:none;" role="alert"></div>
+    <script>
+      (function () {
+        "use strict";
 
-      <form id="adminLoginForm" novalidate>
+        const form = document.getElementById("adminLoginForm");
+        const formAlert = document.getElementById("formAlert");
+        const loginBtn = document.getElementById("loginBtn");
 
-        <!-- Username -->
-        <div class="mb-3">
-          <label for="username" class="form-label">Username <span class="req">*</span></label>
-          <div class="input-with-icon" id="usernameWrap">
-            <i class="fa-regular fa-user input-icon"></i>
-            <input type="text" class="form-control" id="username" name="username"
-                   placeholder="Enter admin username" autocomplete="username">
-          </div>
-          <div class="invalid-feedback" id="usernameFeedback"></div>
-        </div>
+        const usernameEl = document.getElementById("username");
+        const passwordEl = document.getElementById("password");
+        const usernameWrap = document.getElementById("usernameWrap");
+        const passwordWrap = document.getElementById("passwordWrap");
+        const usernameFeedback = document.getElementById("usernameFeedback");
+        const passwordFeedback = document.getElementById("passwordFeedback");
 
-        <!-- Password -->
-        <div class="mb-4">
-          <label for="password" class="form-label">Password <span class="req">*</span></label>
-          <div class="input-with-icon" id="passwordWrap">
-            <i class="fa-solid fa-lock input-icon"></i>
-            <input type="password" class="form-control has-toggle" id="password" name="password"
-                   placeholder="Enter password" autocomplete="current-password">
-            <button type="button" class="password-toggle-btn" id="passwordToggle"
-                    aria-label="Show password">
-              <i class="fa-regular fa-eye" id="passwordToggleIcon"></i>
-            </button>
-          </div>
-          <div class="invalid-feedback" id="passwordFeedback"></div>
-        </div>
+        const passwordToggle = document.getElementById("passwordToggle");
+        const passwordToggleIcon =
+          document.getElementById("passwordToggleIcon");
 
-        <button type="submit" class="btn btn-primary btn-lg w-100" id="loginBtn">
-          Login
-        </button>
+        // --------------------------------------------------
+        // Password toggle
+        // --------------------------------------------------
+        passwordToggle.addEventListener("click", function () {
+          const isPassword = passwordEl.type === "password";
+          passwordEl.type = isPassword ? "text" : "password";
+          passwordToggleIcon.className = isPassword
+            ? "fa-regular fa-eye-slash"
+            : "fa-regular fa-eye";
+          passwordToggle.setAttribute(
+            "aria-label",
+            isPassword ? "Hide password" : "Show password",
+          );
+        });
 
-      </form>
-
-      <p class="admin-login-footer">
-        Not an administrator? <a href="/frontend/public/index.html">Back to Home</a>
-      </p>
-
-    </div>
-  </main>
-
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="/frontend/shared/js/api.js"></script>
-
-  <script>
-  (function () {
-    'use strict';
-
-    const form      = document.getElementById('adminLoginForm');
-    const formAlert = document.getElementById('formAlert');
-    const loginBtn  = document.getElementById('loginBtn');
-
-    const usernameEl = document.getElementById('username');
-    const passwordEl = document.getElementById('password');
-    const usernameWrap = document.getElementById('usernameWrap');
-    const passwordWrap = document.getElementById('passwordWrap');
-    const usernameFeedback = document.getElementById('usernameFeedback');
-    const passwordFeedback = document.getElementById('passwordFeedback');
-
-    const passwordToggle = document.getElementById('passwordToggle');
-    const passwordToggleIcon = document.getElementById('passwordToggleIcon');
-
-    // --------------------------------------------------
-    // Password toggle
-    // --------------------------------------------------
-    passwordToggle.addEventListener('click', function () {
-      const isPassword = passwordEl.type === 'password';
-      passwordEl.type = isPassword ? 'text' : 'password';
-      passwordToggleIcon.className = isPassword
-        ? 'fa-regular fa-eye-slash'
-        : 'fa-regular fa-eye';
-      passwordToggle.setAttribute('aria-label', isPassword ? 'Hide password' : 'Show password');
-    });
-
-    // --------------------------------------------------
-    // Alerts
-    // --------------------------------------------------
-    function hideAlert() {
-      formAlert.style.display = 'none';
-      formAlert.className = 'alert';
-      formAlert.textContent = '';
-    }
-    function showAlert(type, message) {
-      formAlert.className = 'alert alert-' + type;
-      formAlert.innerHTML =
-        '<i class="fa-solid fa-circle-exclamation"></i><span>' + message + '</span>';
-      formAlert.style.display = 'flex';
-    }
-
-    // --------------------------------------------------
-    // Field errors
-    // --------------------------------------------------
-    function setError(wrapEl, feedbackEl, message) {
-      wrapEl.classList.add('has-error');
-      wrapEl.querySelector('.form-control').classList.add('is-invalid');
-      feedbackEl.textContent = message;
-    }
-    function clearError(wrapEl, feedbackEl) {
-      wrapEl.classList.remove('has-error');
-      wrapEl.querySelector('.form-control').classList.remove('is-invalid');
-      feedbackEl.textContent = '';
-    }
-    function clearAllErrors() {
-      clearError(usernameWrap, usernameFeedback);
-      clearError(passwordWrap, passwordFeedback);
-      hideAlert();
-    }
-
-    // Clear errors on typing
-    usernameEl.addEventListener('input', clearAllErrors);
-    passwordEl.addEventListener('input', clearAllErrors);
-
-    // --------------------------------------------------
-    // Submit
-    // --------------------------------------------------
-    form.addEventListener('submit', async function (e) {
-      e.preventDefault();
-      clearAllErrors();
-
-      const username = usernameEl.value.trim();
-      const password = passwordEl.value;
-
-      let ok = true;
-      if (!username) { setError(usernameWrap, usernameFeedback, 'Username is required.'); ok = false; }
-      if (!password) { setError(passwordWrap, passwordFeedback, 'Password is required.'); ok = false; }
-      if (!ok) return;
-
-      loginBtn.disabled = true;
-      loginBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span> Signing in...';
-
-      try {
-        const res = await API.post('/auth/login-admin.php', { username, password });
-
-        // APPROVED
-        if (res.success && res.status === 'approved') {
-          window.location.href = '/frontend/admin/dashboard.html';
-          return;
+        // --------------------------------------------------
+        // Alerts
+        // --------------------------------------------------
+        function hideAlert() {
+          formAlert.style.display = "none";
+          formAlert.className = "alert";
+          formAlert.textContent = "";
+        }
+        function showAlert(type, message) {
+          formAlert.className = "alert alert-" + type;
+          formAlert.innerHTML =
+            '<i class="fa-solid fa-circle-exclamation"></i><span>' +
+            message +
+            "</span>";
+          formAlert.style.display = "flex";
         }
 
-        // INVALID CREDENTIALS
-        if (res.status === 'invalid_credentials' || res.httpStatus === 401) {
-          showAlert('danger', 'Invalid username or password.');
-          loginBtn.disabled = false;
-          loginBtn.innerHTML = 'Login';
-          return;
+        // --------------------------------------------------
+        // Field errors
+        // --------------------------------------------------
+        function setError(wrapEl, feedbackEl, message) {
+          wrapEl.classList.add("has-error");
+          wrapEl.querySelector(".form-control").classList.add("is-invalid");
+          feedbackEl.textContent = message;
+        }
+        function clearError(wrapEl, feedbackEl) {
+          wrapEl.classList.remove("has-error");
+          wrapEl.querySelector(".form-control").classList.remove("is-invalid");
+          feedbackEl.textContent = "";
+        }
+        function clearAllErrors() {
+          clearError(usernameWrap, usernameFeedback);
+          clearError(passwordWrap, passwordFeedback);
+          hideAlert();
         }
 
-        // NOT REGISTERED
-        if (res.status === 'not_registered' || res.httpStatus === 404) {
-          showAlert('danger', 'No admin account found with that username.');
-          loginBtn.disabled = false;
-          loginBtn.innerHTML = 'Login';
-          return;
-        }
+        // Clear errors on typing
+        usernameEl.addEventListener("input", clearAllErrors);
+        passwordEl.addEventListener("input", clearAllErrors);
 
-        // FALLBACK
-        showAlert('danger', API.escapeHTML(res.message || 'Login failed. Please try again.'));
-        loginBtn.disabled = false;
-        loginBtn.innerHTML = 'Login';
+        // --------------------------------------------------
+        // Submit
+        // --------------------------------------------------
+        form.addEventListener("submit", async function (e) {
+          e.preventDefault();
+          clearAllErrors();
 
-      } catch (err) {
-        showAlert('danger', 'Unable to connect. Please check your connection and try again.');
-        loginBtn.disabled = false;
-        loginBtn.innerHTML = 'Login';
-      }
-    });
+          const username = usernameEl.value.trim();
+          const password = passwordEl.value;
 
-  })();
-  </script>
+          let ok = true;
+          if (!username) {
+            setError(usernameWrap, usernameFeedback, "Username is required.");
+            ok = false;
+          }
+          if (!password) {
+            setError(passwordWrap, passwordFeedback, "Password is required.");
+            ok = false;
+          }
+          if (!ok) return;
 
-</body>
+          loginBtn.disabled = true;
+          loginBtn.innerHTML =
+            '<span class="spinner-border spinner-border-sm me-2"></span> Signing in...';
+
+          try {
+            const res = await API.post("/auth/login-admin.php", {
+              username,
+              password,
+            });
+
+            // APPROVED
+            if (res.success && res.status === "approved") {
+              window.location.href = "/frontend/admin/dashboard.html";
+              return;
+            }
+
+            // INVALID CREDENTIALS
+            if (
+              res.status === "invalid_credentials" ||
+              res.httpStatus === 401
+            ) {
+              showAlert("danger", "Invalid username or password.");
+              loginBtn.disabled = false;
+              loginBtn.innerHTML = "Login";
+              return;
+            }
+
+            // NOT REGISTERED
+            if (res.status === "not_registered" || res.httpStatus === 404) {
+              showAlert("danger", "No admin account found with that username.");
+              loginBtn.disabled = false;
+              loginBtn.innerHTML = "Login";
+              return;
+            }
+
+            // FALLBACK
+            showAlert(
+              "danger",
+              API.escapeHTML(res.message || "Login failed. Please try again."),
+            );
+            loginBtn.disabled = false;
+            loginBtn.innerHTML = "Login";
+          } catch (err) {
+            showAlert(
+              "danger",
+              "Unable to connect. Please check your connection and try again.",
+            );
+            loginBtn.disabled = false;
+            loginBtn.innerHTML = "Login";
+          }
+        });
+      })();
+    </script>
+  </body>
 </html>

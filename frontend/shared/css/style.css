@@ -4389,3 +4389,21 @@ textarea.form-control {
     margin: 0 0 var(--space-md);
     text-align: center;
 }
+
+/* ---------------------------------------------------------
+   39. BRAND LOGO IMAGE
+   --------------------------------------------------------- */
+.brand-logo-img {
+    height: 70px;
+    width: auto;
+    max-width: 250px;
+    display: block;
+    object-fit: contain;
+}
+
+/* Keep the brand text (if any) aligned with the logo */
+.navbar-brand-custom {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+}
