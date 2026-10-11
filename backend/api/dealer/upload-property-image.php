@@ -82,13 +82,18 @@ try {
         exit;
     }
 
-    // Upload base dir: <project>/uploads/property_images
-    $baseDir = realpath(__DIR__ . '/../../../uploads/property_images');
+        // Build the project root and upload paths
+    $projectRoot = dirname(__DIR__, 3);
+    $uploadsRoot = $projectRoot . DIRECTORY_SEPARATOR . 'uploads';
+    $baseDir     = $uploadsRoot . DIRECTORY_SEPARATOR . 'property_images';
 
-    if ($baseDir === false) {
-        http_response_code(500);
-        echo json_encode(['success' => false, 'message' => 'Upload directory is not available.']);
-        exit;
+    // Create the base folder if it doesn't exist (survives fresh deployments)
+    if (!is_dir($baseDir)) {
+        if (!@mkdir($baseDir, 0775, true)) {
+            http_response_code(500);
+            echo json_encode(['success' => false, 'message' => 'Unable to create upload directory.']);
+            exit;
+        }
     }
 
     $propertyDir = $baseDir . DIRECTORY_SEPARATOR . $propertyId;
