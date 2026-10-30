@@ -42,7 +42,8 @@
     --status-danger: #D93025;
     --status-sold: #6B7280;
     --status-unsold: #006AFF;
-
+    /* --status-unsold: #22C55E;
+    --status-sold: #ef4444; */
     /* Skeleton */
     --skeleton-bg: #E9EEF6;
 
@@ -1167,7 +1168,7 @@ textarea.form-control {
 .hero-section {
     background:
         linear-gradient(rgba(15, 74, 161, 0.3), rgba(0, 106, 255, 0.3)),
-        url("https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1920&q=80") center / cover no-repeat;
+        url("../img/hero-img.avif") center / cover no-repeat;
     background-color: var(--brand-primary-dark);
     color: #fff;
     padding: 80px 0 90px;

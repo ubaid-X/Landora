@@ -8,7 +8,7 @@
      - API.post(path, body)→ POST JSON with credentials
      - API.postForm(path, formData) → POST multipart (file upload)
      - API.getQuery(name)  → reads ?param= from current URL
-     - API.redirect(path)  → navigate
+     - command:workbench.action.addRootFolderAPI.redirect(path)  → navigate
      - API.escapeHTML(str) → safe HTML output
      - API.formatPrice(str)→ "12000000.00" → "Rs. 1,20,00,000"
      - API.imageUrl(path)  → prepends "/" to stored path

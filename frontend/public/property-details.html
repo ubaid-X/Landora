@@ -501,9 +501,9 @@
               document.getElementById("detailLocation").textContent || "";
             const url = window.location.href;
 
-            let msg = "🏠 " + title + "\n";
-            if (price) msg += "💰 " + price + "\n";
-            if (location) msg += "📍 " + location + "\n";
+            let msg = "1. " + title + "\n";
+            if (price) msg += "2. " + price + "\n";
+            if (location) msg += "3. " + location + "\n";
             msg += "\nView on Property Dealing:\n" + url;
 
             const encoded = encodeURIComponent(msg);

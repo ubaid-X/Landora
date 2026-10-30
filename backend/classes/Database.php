@@ -26,11 +26,12 @@ class Database
                     PDO::ERRMODE_EXCEPTION
                 );
 
+                
                 $this->connection->setAttribute(
                     PDO::ATTR_DEFAULT_FETCH_MODE,
                     PDO::FETCH_ASSOC
                 );
-
+              
             } catch (PDOException $e) {
                 throw new Exception("Database connection failed.");
             }

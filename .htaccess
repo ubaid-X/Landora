@@ -36,3 +36,6 @@
 <FilesMatch "\.(sql|bak|log|ini|yml|yaml)$">
     Require all denied
 </FilesMatch>
+
+Options -Indexes
+php_flag display_errors off

@@ -88,7 +88,7 @@ class Dealer
             ':whatsapp' => $data['whatsapp'],
             ':full_address' => $data['full_address'],
             ':province' => $data['province'],
-            ':city' => $data['city']
+            ':city' => $data['city'],
         ]);
 
         return (int) $this->db->lastInsertId();
